@@ -1,0 +1,9 @@
+city,mode,perturbation,delta,n_rows,mean_delta_aqi
+Peshawar,simulation,wind_speed_10m,5.0,3607,-1.9153899928137548
+Peshawar,simulation,relative_humidity_2m,20.0,3607,0.17978002218228906
+Peshawar,forecast,wind_speed_10m,5.0,3607,-0.1279542918628611
+Peshawar,forecast,relative_humidity_2m,20.0,3607,-0.01761545563177613
+Lahore,simulation,wind_speed_10m,5.0,2442,-11.079130219263117
+Lahore,simulation,relative_humidity_2m,20.0,2442,-0.08645824554337937
+Lahore,forecast,wind_speed_10m,5.0,2442,-1.1645585777225274
+Lahore,forecast,relative_humidity_2m,20.0,2442,0.09500571264286094
