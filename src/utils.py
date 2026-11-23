@@ -261,6 +261,193 @@ def stagnation_flag(wind_speed_10m: np.ndarray | float) -> np.ndarray | int:
     return int(flag) if flag.ndim == 0 else flag
 
 
+# Magnus formula constants for saturation vapour pressure over water (Sonntag
+# 1990 fit, as used by the WMO). They are accurate to about 0.1 degree C in
+# dew point for air temperatures from -45 to 60 degrees C.
+_MAGNUS_A: float = 17.62
+_MAGNUS_B: float = 243.12  # degrees C
+
+
+def dew_point_c(
+    temperature_2m: np.ndarray | float,
+    relative_humidity_2m: np.ndarray | float,
+) -> np.ndarray | float:
+    """Estimate the dew point in degrees C with the Magnus formula.
+
+    Exact formula, with a = 17.62 and b = 243.12 degrees C::
+
+        gamma     = ln(RH / 100) + a * T / (b + T)
+        dew_point = b * gamma / (a - gamma)
+
+    T is temperature_2m in degrees C and RH is relative_humidity_2m in %.
+    The constants fit saturation over liquid water and are valid for T from
+    -45 to 60 degrees C, which covers Peshawar and Lahore. The dashboard shows
+    the result next to temperature and humidity; it is derived from those two
+    real columns, not new data.
+
+    Example: (20 C, 50 %) -> about 9.3 C; at RH = 100 % the dew point equals T.
+
+    Args:
+        temperature_2m: Air temperature at 2 m in degrees C (scalar or
+            array-like).
+        relative_humidity_2m: Relative humidity at 2 m in % (scalar or
+            array-like, broadcastable against ``temperature_2m``).
+
+    Returns:
+        A float for scalar inputs, otherwise a float array. NaN where an input
+        is NaN, where RH is not in (0, 100], or where T is not above -b (the
+        formula's pole), because the logarithm or the fraction is undefined or
+        meaningless there.
+    """
+    temp = np.asarray(temperature_2m, dtype=float)
+    rh = np.asarray(relative_humidity_2m, dtype=float)
+    valid = (rh > 0.0) & (rh <= 100.0) & (temp > -_MAGNUS_B)
+    # Invalid entries are replaced by harmless values before the maths and set
+    # to NaN afterwards, so log(0) or division by zero never emit warnings.
+    safe_rh = np.where(valid, rh, 50.0)
+    safe_temp = np.where(valid, temp, 0.0)
+    gamma = np.log(safe_rh / 100.0) + _MAGNUS_A * safe_temp / (_MAGNUS_B + safe_temp)
+    dew = np.where(valid, _MAGNUS_B * gamma / (_MAGNUS_A - gamma), np.nan)
+    return float(dew) if dew.ndim == 0 else dew
+
+
+def _finite_float(value: float, name: str) -> float:
+    """Convert a scalar to float and reject NaN and infinity.
+
+    Args:
+        value: Scalar to check.
+        name: Argument name used in the error message.
+
+    Returns:
+        ``value`` as a Python float.
+
+    Raises:
+        ValueError: If ``value`` cannot be converted to float or is NaN/inf.
+    """
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a number, got {value!r}") from exc
+    if not np.isfinite(number):
+        raise ValueError(f"{name} must be finite, got {number}")
+    return number
+
+
+def clamp_slider_default(value: float, low: float, high: float) -> tuple[float, bool]:
+    """Clip an observed value into a slider range for use as its default.
+
+    Streamlit rejects a slider default outside ``[low, high]``, so an observed
+    value outside the range starts the slider at the nearest bound, and the
+    dashboard shows the real value next to it (Requirement 17.11).
+
+    Args:
+        value: Latest observed value for the slider's variable.
+        low: Lower slider bound.
+        high: Upper slider bound.
+
+    Returns:
+        ``(clipped, was_clamped)``: ``clipped`` is ``min(max(value, low), high)``
+        as a float, and ``was_clamped`` is True iff ``value`` lies outside
+        ``[low, high]``. A value equal to a bound is not clamped.
+
+    Raises:
+        ValueError: If any argument is NaN, infinite, or not a number, or if
+            ``low > high``.
+    """
+    value = _finite_float(value, "value")
+    low = _finite_float(low, "low")
+    high = _finite_float(high, "high")
+    if low > high:
+        raise ValueError(f"low must not exceed high, got low={low}, high={high}")
+    clipped = min(max(value, low), high)
+    return clipped, bool(value < low or value > high)
+
+
+# Columns build_scenario_row writes itself. They may be absent from base_row,
+# because their values come from the sliders rather than from the observation.
+_SCENARIO_OVERRIDES: tuple[str, ...] = (
+    "wind_speed_10m", "temperature_2m", "relative_humidity_2m",
+    "stagnation_flag", "inversion_proxy",
+)
+
+
+def build_scenario_row(
+    base_row: pd.Series | pd.DataFrame,
+    wind: float,
+    temp: float,
+    humidity: float,
+    feature_cols: list[str],
+) -> pd.DataFrame:
+    """Build the one-row Simulation_Mode input for a What-If scenario.
+
+    Starts from the latest observed features, sets wind_speed_10m,
+    temperature_2m, and relative_humidity_2m to the slider values, and
+    recomputes stagnation_flag and inversion_proxy from them with
+    :func:`stagnation_flag` and :func:`inversion_proxy`, so the derived
+    features never contradict the sliders. Every other column, including
+    pm2_5_rolling_mean_24h and any rolling weather means, keeps its observed
+    value: the scenario changes only the current-hour weather.
+
+    The slider values are not range-checked here, because the dashboard also
+    calls this with the real observed values to get the baseline prediction,
+    and those may lie outside the slider range.
+
+    Args:
+        base_row: Latest observed feature row, as a Series or a one-row
+            DataFrame. It is not modified.
+        wind: Scenario wind speed at 10 m in km/h.
+        temp: Scenario temperature at 2 m in degrees C.
+        humidity: Scenario relative humidity at 2 m in %.
+        feature_cols: Model feature columns, in the order the model expects.
+
+    Returns:
+        A new one-row DataFrame with exactly ``feature_cols`` as columns, in
+        that order. Only the five scenario columns listed above are changed,
+        and only if they are in ``feature_cols``.
+
+    Raises:
+        ValueError: If a slider value is NaN, infinite, or not a number; if
+            ``base_row`` is a DataFrame without exactly one row; if
+            ``feature_cols`` has duplicates; or if a feature column other than
+            the five scenario columns is missing from ``base_row`` (the
+            message names the missing columns).
+    """
+    wind = _finite_float(wind, "wind")
+    temp = _finite_float(temp, "temp")
+    humidity = _finite_float(humidity, "humidity")
+
+    if isinstance(base_row, pd.DataFrame):
+        if len(base_row) != 1:
+            raise ValueError(
+                f"base_row DataFrame must have exactly one row, got {len(base_row)}"
+            )
+        base = base_row.iloc[0]
+    else:
+        base = base_row
+
+    cols = list(feature_cols)
+    duplicates = sorted({c for c in cols if cols.count(c) > 1})
+    if duplicates:
+        raise ValueError(f"feature_cols has duplicate columns: {duplicates}")
+    missing = [c for c in cols if c not in base.index and c not in _SCENARIO_OVERRIDES]
+    if missing:
+        raise ValueError(f"base_row is missing feature columns: {missing}")
+
+    overrides = {
+        "wind_speed_10m": wind,
+        "temperature_2m": temp,
+        "relative_humidity_2m": humidity,
+        "stagnation_flag": stagnation_flag(wind),
+        "inversion_proxy": inversion_proxy(temp, humidity),
+    }
+    # A fresh dict of values means the caller's row is never written to.
+    values = {c: overrides[c] if c in overrides else base[c] for c in cols}
+    # A row taken from a mixed-type frame has object dtype; infer_objects gives
+    # the columns numeric dtypes again so the model sees the usual floats.
+    row = pd.DataFrame([values], columns=cols).infer_objects()
+    return row
+
+
 def _paired_vectors(
     y_true: np.ndarray | pd.Series | list[float],
     y_pred: np.ndarray | pd.Series | list[float],

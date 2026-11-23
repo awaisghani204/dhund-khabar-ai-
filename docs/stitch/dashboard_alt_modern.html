@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dhund-Khabar AI (دُھند خبر) — Atmospheric Intelligence &amp; Smog Forecasting</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Noto+Nastaliq+Urdu:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              emerald: "#10B981",
+              teal: "#14b8a6",
+              violet: "#8b5cf6",
+              rose: "#f43f5e",
+              amber: "#f59e0b",
+              sky: "#38bdf8"
+            }
+          },
+          fontFamily: {
+            sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            urdu: ['"Noto Nastaliq Urdu"', 'serif'],
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      background-color: #08090d;
+      color: #f1f5f9;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient background mesh glow */
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: 
+        radial-gradient(circle at 18% 12%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 82% 18%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 60%, rgba(56, 189, 248, 0.04) 0%, transparent 50%);
+    }
+
+    /* Glass Panels */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-card-subtle {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Range slider modern Apple/Linear styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+      height: 24px;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 5px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      border: none;
+      transition: background 0.2s ease;
+    }
+    input[type=range]:hover::-webkit-slider-runnable-track {
+      background: rgba(255, 255, 255, 0.14);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      cursor: grab;
+      -webkit-appearance: none;
+      margin-top: -6.5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 14px rgba(16, 185, 129, 0.4);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:active {
+      cursor: grabbing;
+      transform: scale(1.18);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 0 2px #10b981;
+    }
+
+    /* Circular Progress Arc */
+    .gauge-ring {
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease;
+    }
+
+    /* Radar scan */
+    @keyframes radar-pulse {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .radar-sweep {
+      animation: radar-pulse 7s linear infinite;
+      transform-origin: center center;
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-emerald-500/20 selection:text-emerald-300 relative text-slate-100 antialiased font-sans">
+<!-- Subtle Ambient Light -->
+<div class="ambient-glow"></div>
+<!-- HEADER NAVIGATION -->
+<header class="sticky top-0 z-50 border-b border-white/[0.06] bg-[#08090d]/80 backdrop-blur-xl">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+<!-- Brand & Status -->
+<div class="flex items-center gap-3.5">
+<div class="relative flex items-center justify-center w-8 h-8 rounded-xl bg-white/[0.04] border border-white/[0.08] shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-emerald-400">cloud_sync</span>
+<span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="text-sm font-semibold tracking-tight text-white flex items-center gap-1.5">
+            Dhund-Khabar <span class="text-[11px] font-mono font-medium px-1.5 py-0.5 rounded-full bg-white/[0.06] text-slate-300 border border-white/[0.08]">AI 2.4</span>
+</span>
+<span class="font-urdu text-xs text-slate-400 font-bold px-1.5 py-0.5 bg-white/[0.03] border border-white/[0.06] rounded-md tracking-normal">
+            دُھند خبر
+          </span>
+</div>
+<div class="hidden md:flex items-center gap-2 pl-3 ml-2 border-l border-white/[0.08] text-xs font-mono text-slate-400">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span>EPD-Punjab &amp; KP-EPA Satellite Telemetry</span>
+</div>
+</div>
+<!-- Station Meta & Live Refresh -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs text-slate-300 font-mono">
+<span class="text-slate-500">STATION:</span>
+<span class="text-slate-200 font-medium" id="station-id">PK-PWR-01 (Khyber Pass Baseline)</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.07] rounded-full transition-all duration-200" id="btn-live-pulse" onclick="refreshTelemetry()">
+<span class="material-symbols-outlined text-[15px] text-emerald-400">sync</span>
+<span class="hidden sm:inline font-mono">Sync Telemetry</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN VIEWPORT -->
+<main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+<!-- SUB-NAV: REGION SWITCH & TIME HORIZON -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-2 rounded-2xl glass-panel">
+<!-- Target Region Segmented Switch -->
+<div class="flex items-center gap-2">
+<span class="text-xs font-mono uppercase tracking-wider text-slate-400 px-2 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-slate-400">near_me</span>
+          Region
+        </span>
+<div class="flex p-1 rounded-xl bg-black/40 border border-white/[0.05]">
+<button class="city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/[0.1] text-white shadow-sm font-sans" id="tab-pwr" onclick="setCity('peshawar')">
+            Peshawar <span class="font-urdu text-[11px] opacity-80 ml-0.5">(پشاور)</span>
+</button>
+<button class="city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-slate-400 hover:text-slate-200 font-sans" id="tab-lhr" onclick="setCity('lahore')">
+            Lahore <span class="font-urdu text-[11px] opacity-80 ml-0.5">(لاہور)</span>
+</button>
+</div>
+</div>
+<!-- Quick Comparison Barometer -->
+<div class="hidden lg:flex items-center gap-6 text-xs text-slate-400">
+<div class="flex items-center gap-2">
+<span>Peshawar Baseline:</span>
+<span class="font-mono font-semibold text-purple-400">AQI 318</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">Hazardous</span>
+</div>
+<div class="w-px h-3.5 bg-white/[0.08]"></div>
+<div class="flex items-center gap-2">
+<span>Lahore Central Grid:</span>
+<span class="font-mono font-semibold text-rose-400">AQI 422</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-rose-500/10 text-rose-300 border border-rose-500/20">Severe Critical</span>
+</div>
+</div>
+<!-- Horizon Selector -->
+<div class="flex items-center gap-2 self-end sm:self-auto">
+<span class="text-xs font-mono uppercase tracking-wider text-slate-400 hidden sm:inline px-1">Horizon</span>
+<div class="flex p-1 rounded-xl bg-black/40 border border-white/[0.05]">
+<button class="horizon-btn px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200 bg-white/[0.1] text-white" onclick="setHorizon(24, this)">+24h</button>
+<button class="horizon-btn px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200 text-slate-400 hover:text-white" onclick="setHorizon(48, this)">+48h</button>
+<button class="horizon-btn px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200 text-slate-400 hover:text-white" onclick="setHorizon(72, this)">+72h</button>
+</div>
+</div>
+</div>
+<!-- HERO SECTION: MINIMALIST AQI RING & 3 ESSENTIAL CONDITION TILES -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+<!-- HERO AQI INSTRUMENT (5 Cols) -->
+<div class="lg:col-span-5 rounded-2xl glass-panel p-6 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+<!-- Soft Radial Accent Glow inside card -->
+<div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-purple-500/10 blur-[60px] pointer-events-none transition-all duration-700" id="ambient-hazard-glow"></div>
+<!-- Header -->
+<div class="flex items-center justify-between mb-4 relative z-10">
+<div>
+<div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-400">
+<span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              Air Quality Index (US EPA)
+            </div>
+<h2 class="text-lg font-semibold tracking-tight text-white mt-0.5" id="card-city-label">
+              Peshawar Valley Inversion AQI
+            </h2>
+</div>
+<span class="text-[11px] font-mono text-slate-400 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06]" id="live-timestamp">
+            Live Calibrated
+          </span>
+</div>
+<!-- Center Ring Visual & Readout -->
+<div class="my-5 flex flex-col items-center justify-center relative z-10">
+<div class="relative w-56 h-56 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 180 180">
+<!-- Background Track -->
+<circle cx="90" cy="90" fill="none" r="74" stroke="rgba(255, 255, 255, 0.05)" stroke-width="8"></circle>
+<!-- Colored Progress Arc -->
+<circle class="gauge-ring" cx="90" cy="90" fill="none" id="hero-gauge-circle" r="74" stroke="#a855f7" stroke-dasharray="465" stroke-dashoffset="150" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<!-- Absolute Center Content -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-6xl font-bold tracking-tight text-white font-mono" id="hero-aqi-num">318</span>
+<span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 mt-1">AQI-US</span>
+</div>
+</div>
+<!-- Status Pill -->
+<div class="mt-2">
+<span class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide bg-purple-500/10 text-purple-300 border border-purple-500/25 transition-all" id="hero-tier-badge">
+              Hazardous (خطرناک)
+            </span>
+</div>
+</div>
+<!-- 4 Minimalist Pollutant Chips -->
+<div class="pt-5 border-t border-white/[0.06] relative z-10">
+<div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-2.5">
+<span>AEROSOL SPECIATION</span>
+<span class="text-emerald-400" id="forecast-target-time">Target: +24h Horizon</span>
+</div>
+<div class="grid grid-cols-4 gap-2 text-center font-mono">
+<div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+<span class="text-[10px] text-slate-500 block">PM2.5</span>
+<span class="text-sm font-semibold text-rose-400" id="spec-pm25">268.4</span>
+<span class="text-[9px] text-slate-500 block">µg/m³</span>
+</div>
+<div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+<span class="text-[10px] text-slate-500 block">PM10</span>
+<span class="text-sm font-semibold text-amber-300" id="spec-pm10">412.0</span>
+<span class="text-[9px] text-slate-500 block">µg/m³</span>
+</div>
+<div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+<span class="text-[10px] text-slate-500 block">NO₂</span>
+<span class="text-sm font-semibold text-sky-400" id="spec-no2">89.2</span>
+<span class="text-[9px] text-slate-500 block">ppb</span>
+</div>
+<div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+<span class="text-[10px] text-slate-500 block">CO</span>
+<span class="text-sm font-semibold text-emerald-400" id="spec-co">2.8</span>
+<span class="text-[9px] text-slate-500 block">ppm</span>
+</div>
+</div>
+</div>
+</div>
+<!-- KEY ATMOSPHERIC TILES (7 Cols) -->
+<div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Tile 1: PM2.5 Mass & Trend -->
+<div class="p-5 rounded-2xl glass-panel flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-emerald-400">grain</span>
+              PM2.5 Concentration
+            </span>
+<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-rose-500/10 text-rose-300 border border-rose-500/20">
+              17.8x WHO Limit
+            </span>
+</div>
+<div class="my-4">
+<div class="flex items-baseline gap-1.5">
+<span class="text-4xl font-bold tracking-tight text-white font-mono" id="val-pm25">268.4</span>
+<span class="text-xs font-mono text-slate-400">µg/m³</span>
+</div>
+<div class="text-xs text-rose-400 font-mono flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+              +14.2% trajectory over 24h baseline
+            </div>
+</div>
+<!-- Micro bar sparkline -->
+<div class="pt-3 border-t border-white/[0.06]">
+<div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+<span>Diurnal Trajectory</span>
+<span class="text-slate-300">Peak @ 04:00</span>
+</div>
+<div class="flex items-end gap-1.5 h-6">
+<div class="flex-1 bg-white/[0.08] hover:bg-emerald-400 rounded-t h-[35%] transition-all"></div>
+<div class="flex-1 bg-white/[0.08] hover:bg-emerald-400 rounded-t h-[50%] transition-all"></div>
+<div class="flex-1 bg-white/[0.12] hover:bg-emerald-400 rounded-t h-[75%] transition-all"></div>
+<div class="flex-1 bg-purple-500/80 hover:bg-emerald-400 rounded-t h-[100%] transition-all"></div>
+<div class="flex-1 bg-purple-500/70 hover:bg-emerald-400 rounded-t h-[88%] transition-all"></div>
+<div class="flex-1 bg-white/[0.12] hover:bg-emerald-400 rounded-t h-[70%] transition-all"></div>
+<div class="flex-1 bg-white/[0.08] hover:bg-emerald-400 rounded-t h-[58%] transition-all"></div>
+<div class="flex-1 bg-white/[0.08] hover:bg-emerald-400 rounded-t h-[64%] transition-all"></div>
+</div>
+</div>
+</div>
+<!-- Tile 2: Wind Vector & Stagnation -->
+<div class="p-5 rounded-2xl glass-panel flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-sky-400">air</span>
+              Wind &amp; Dispersion
+            </span>
+<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              High Stagnation
+            </span>
+</div>
+<div class="my-3 flex items-center gap-4">
+<!-- Minimal Compass Dial -->
+<div class="relative w-14 h-14 rounded-full border border-white/[0.08] bg-black/30 flex items-center justify-center shrink-0">
+<span class="absolute top-1 text-[8px] font-mono text-slate-400 font-bold">N</span>
+<div class="relative w-8 h-8 flex items-center justify-center transition-transform duration-500" id="wind-needle" style="transform: rotate(55deg);">
+<div class="w-0.5 h-6 bg-gradient-to-t from-transparent via-sky-400 to-emerald-400 rounded-full"></div>
+<div class="absolute w-1.5 h-1.5 rounded-full bg-white shadow-sm"></div>
+</div>
+</div>
+<div>
+<div class="flex items-baseline gap-1.5">
+<span class="text-3xl font-bold tracking-tight text-white font-mono" id="val-wind-speed">4.8</span>
+<span class="text-xs font-mono text-slate-400">km/h</span>
+</div>
+<div class="text-xs text-slate-300 font-mono mt-0.5">
+                Vector: <strong class="text-sky-300" id="val-wind-dir">NE (55°)</strong> • Calm Breeze
+              </div>
+</div>
+</div>
+<div class="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-slate-400">
+<span>Flushing Rate:</span>
+<span class="text-rose-400 font-medium">0.12 km²/h (Trapped)</span>
+</div>
+</div>
+<!-- Tile 3: Thermal Inversion Cap -->
+<div class="p-5 rounded-2xl glass-panel flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-amber-400">layers</span>
+              Inversion Ceiling
+            </span>
+<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+              Severe Trapping
+            </span>
+</div>
+<div class="my-3 p-3 rounded-xl bg-black/30 border border-white/[0.04] space-y-1.5 text-xs font-mono">
+<div class="flex justify-between items-center text-slate-300">
+<span class="text-purple-300">Cap Altitude:</span>
+<span class="font-bold text-white text-sm" id="val-cap-alt">180 m AGL</span>
+</div>
+<!-- Strata indicator -->
+<div class="w-full h-2 rounded-full bg-gradient-to-r from-purple-500/30 via-rose-500/30 to-purple-500/30 border border-purple-500/30"></div>
+<div class="flex justify-between text-[10px] text-slate-500">
+<span>Ground (0m)</span>
+<span>Layer: Compressed</span>
+</div>
+</div>
+<div class="pt-3 border-t border-white/[0.06] flex justify-between text-xs font-mono text-slate-400">
+<span>Ground Gradient (dT/dz):</span>
+<span class="text-amber-300 font-semibold">+3.8 °C / 100m</span>
+</div>
+</div>
+<!-- Tile 4: Psychrometrics (Temp, RH, Dew Point) -->
+<div class="p-5 rounded-2xl glass-panel flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-emerald-400">device_thermostat</span>
+              Psychrometric Matrix
+            </span>
+<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+              Mist Saturation: 92%
+            </span>
+</div>
+<div class="grid grid-cols-3 gap-2 my-2 text-center font-mono">
+<div class="p-2 rounded-xl bg-black/30 border border-white/[0.04]">
+<span class="text-[10px] text-slate-500 block">TEMP</span>
+<span class="text-lg font-bold text-white" id="val-temp">14.2</span>
+<span class="text-[10px] text-slate-500">°C</span>
+</div>
+<div class="p-2 rounded-xl bg-black/30 border border-white/[0.04]">
+<span class="text-[10px] text-slate-500 block">HUMID</span>
+<span class="text-lg font-bold text-sky-400" id="val-humidity">86</span>
+<span class="text-[10px] text-slate-500">% RH</span>
+</div>
+<div class="p-2 rounded-xl bg-black/30 border border-white/[0.04]">
+<span class="text-[10px] text-slate-500 block">DEW PT</span>
+<span class="text-lg font-bold text-emerald-400" id="val-dewpoint">11.9</span>
+<span class="text-[10px] text-slate-500">°C</span>
+</div>
+</div>
+<div class="pt-3 border-t border-white/[0.06] flex justify-between text-xs font-mono text-slate-400">
+<span>Aerosol Condensation:</span>
+<span class="text-emerald-400 font-medium">Hygroscopic Growth</span>
+</div>
+</div>
+</div>
+</div>
+<!-- WHAT-IF SIMULATION LAB (SYNTHESIZER / LINEAR PANEL STYLE) -->
+<section class="rounded-2xl glass-panel p-6 relative overflow-hidden">
+<!-- Section Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/[0.06]">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<h3 class="text-base font-semibold text-white tracking-tight">
+              Counterfactual Simulation Lab <span class="font-urdu text-sm font-normal text-slate-400 ml-1">(تجربہ گاہ)</span>
+</h3>
+<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-slate-300">
+              Physics &amp; ML Hybrid
+            </span>
+</div>
+<p class="text-xs text-slate-400 mt-1">
+            Simulate hypothetical policy interventions or sudden meteorological frontal shifts in real-time.
+          </p>
+</div>
+<!-- Quick Presets & Reset -->
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg text-xs font-mono bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] text-slate-300 hover:text-white transition" onclick="applyPreset('rain')">
+            Heavy Rain / Front
+          </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-mono bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] text-slate-300 hover:text-white transition" onclick="applyPreset('lockdown')">
+            Traffic Curfew
+          </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-mono bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] text-slate-400 hover:text-white transition flex items-center gap-1" onclick="resetSimulation()">
+<span class="material-symbols-outlined text-[14px]">restart_alt</span>
+            Reset
+          </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mt-6">
+<!-- Controls Column (7 Cols) -->
+<div class="lg:col-span-7 space-y-6">
+<!-- Slider 1: Wind Speed -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center text-xs font-mono">
+<span class="text-slate-300 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-sky-400">air</span>
+                Wind Vector Magnitude
+              </span>
+<span class="font-bold text-white px-2 py-0.5 rounded bg-black/40 border border-white/[0.06]" id="sim-wind-val">4.8 km/h</span>
+</div>
+<input class="w-full" id="sim-wind-slider" max="35" min="1" oninput="runSimulation()" step="0.5" type="range" value="4.8"/>
+<div class="flex justify-between text-[11px] font-mono text-slate-500">
+<span>1 km/h (Dead Calm)</span>
+<span class="text-slate-400">Flushing index: -12 AQI per +5km/h</span>
+<span>35 km/h (Frontal)</span>
+</div>
+</div>
+<!-- Slider 2: Ambient Temperature -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center text-xs font-mono">
+<span class="text-slate-300 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-amber-400">thermostat</span>
+                Boundary Temperature
+              </span>
+<span class="font-bold text-white px-2 py-0.5 rounded bg-black/40 border border-white/[0.06]" id="sim-temp-val">14.2 °C</span>
+</div>
+<input class="w-full" id="sim-temp-slider" max="38" min="5" oninput="runSimulation()" step="0.5" type="range" value="14.2"/>
+<div class="flex justify-between text-[11px] font-mono text-slate-500">
+<span>5 °C (Severe Cold Snap)</span>
+<span class="text-slate-400">Break Inversion Cap: &gt; 22 °C</span>
+<span>38 °C (Warm Dispersal)</span>
+</div>
+</div>
+<!-- Slider 3: Anthropogenic Emissions -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center text-xs font-mono">
+<span class="text-slate-300 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-purple-400">factory</span>
+                Anthropogenic Source Throttling
+              </span>
+<span class="font-bold text-white px-2 py-0.5 rounded bg-black/40 border border-white/[0.06]" id="sim-emiss-val">0% (Full)</span>
+</div>
+<input class="w-full" id="sim-emiss-slider" max="80" min="0" oninput="runSimulation()" step="5" type="range" value="0"/>
+<div class="flex justify-between text-[11px] font-mono text-slate-500">
+<span>0% (Unchecked)</span>
+<span class="text-slate-400">Odd-Even + Kiln Lock: 40%</span>
+<span>-80% (Lockdown)</span>
+</div>
+</div>
+</div>
+<!-- Counterfactual Output Card (5 Cols) -->
+<div class="lg:col-span-5 rounded-xl bg-black/40 border border-white/[0.08] p-5 relative overflow-hidden">
+<div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 flex items-center justify-between">
+<span>Projected Outcome</span>
+<span class="text-emerald-400 font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Runtime Eval
+            </span>
+</div>
+<div class="my-4">
+<div class="flex items-baseline gap-3">
+<span class="font-mono text-5xl font-bold tracking-tight text-white" id="sim-result-aqi">318</span>
+<div>
+<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20" id="sim-result-tier">
+                  Hazardous
+                </span>
+</div>
+</div>
+<div class="mt-2 text-xs font-mono text-slate-400">
+              Baseline Delta: <span class="text-slate-200 font-semibold" id="sim-result-delta">0 pts (±0.0%)</span>
+</div>
+</div>
+<div class="pt-3 border-t border-white/[0.06] text-xs font-mono space-y-1.5">
+<div class="text-slate-400 text-[11px]">ADVISORY FORECAST:</div>
+<p class="text-slate-300 text-xs leading-relaxed" id="sim-advisory-text">
+              Severe stagnant inversion persists. Complete school closure mandatory; hospital nebulizer demand exceeding 300% surge index.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- VISUAL ANALYTICS & HIGH RESOLUTION TIMESERIES -->
+<section class="rounded-2xl glass-panel p-6 space-y-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<h3 class="text-base font-semibold text-white tracking-tight">
+              High-Precision Forecast Trajectory &amp; Model Benchmark
+            </h3>
+</div>
+<p class="text-xs text-slate-400 mt-1">
+            Ground-truth telemetry vs Dhund-Khabar Gradient Ensemble with 95% Bayesian confidence envelope.
+          </p>
+</div>
+<!-- Legend -->
+<div class="flex items-center gap-4 text-xs font-mono text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-slate-500 rounded-full"></span>
+<span>Observed</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-emerald-400 rounded-full"></span>
+<span class="text-slate-200">Model Forecast</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xs"></span>
+<span>95% CI</span>
+</div>
+</div>
+</div>
+<!-- SMOOTH SLEEK SVG CHART -->
+<div class="rounded-xl bg-black/40 border border-white/[0.05] p-4 relative overflow-hidden">
+<svg class="w-full h-auto overflow-visible select-none font-mono" viewbox="0 0 1000 280">
+<defs>
+<lineargradient id="chartGlowArea" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#10B981" stop-opacity="0.18"></stop>
+<stop offset="100%" stop-color="#10B981" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="chartConfidence" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#38bdf8" stop-opacity="0.12"></stop>
+<stop offset="100%" stop-color="#38bdf8" stop-opacity="0.02"></stop>
+</lineargradient>
+<lineargradient id="forecastLineGrad" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0%" stop-color="#10B981"></stop>
+<stop offset="60%" stop-color="#38BDF8"></stop>
+<stop offset="100%" stop-color="#A855F7"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Grid Lines -->
+<line stroke="rgba(255,255,255,0.04)" stroke-dasharray="3 3" x1="50" x2="980" y1="40" y2="40"></line>
+<text fill="#64748b" font-size="9" x="12" y="44">400 HAZ</text>
+<line stroke="rgba(255,255,255,0.04)" stroke-dasharray="3 3" x1="50" x2="980" y1="95" y2="95"></line>
+<text fill="#64748b" font-size="9" x="12" y="99">300 V.UNH</text>
+<line stroke="rgba(255,255,255,0.04)" stroke-dasharray="3 3" x1="50" x2="980" y1="150" y2="150"></line>
+<text fill="#64748b" font-size="9" x="12" y="154">200 UNH</text>
+<line stroke="rgba(255,255,255,0.04)" stroke-dasharray="3 3" x1="50" x2="980" y1="205" y2="205"></line>
+<text fill="#64748b" font-size="9" x="12" y="209">100 MOD</text>
+<line stroke="rgba(255,255,255,0.08)" stroke-width="1" x1="50" x2="980" y1="250" y2="250"></line>
+<text fill="#475569" font-size="9" x="25" y="254">0</text>
+<!-- NOW dividing line -->
+<line opacity="0.4" stroke="#10b981" stroke-dasharray="2 3" stroke-width="1.5" x1="550" x2="550" y1="20" y2="250"></line>
+<text fill="#10B981" font-size="9" font-weight="600" x="525" y="15">SYNC T-0</text>
+<!-- Historical Curve (Observed) -->
+<path d="M 50 190 Q 90 200, 130 165 T 210 145 T 290 110 T 370 125 T 450 90 T 550 85" fill="none" stroke="#64748b" stroke-linecap="round" stroke-width="2"></path>
+<!-- Confidence Area -->
+<path d="M 550 85 C 620 80, 700 70, 780 65 C 840 60, 910 56, 970 52 L 970 120 C 910 125, 840 130, 780 122 C 700 112, 620 100, 550 85 Z" fill="url(#chartConfidence)"></path>
+<!-- Forecast Curved Line -->
+<path d="M 550 85 C 620 75, 700 66, 780 62 C 840 59, 910 54, 970 50" fill="none" stroke="url(#forecastLineGrad)" stroke-dasharray="5 3" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Data Points -->
+<circle cx="550" cy="85" fill="#10B981" r="4.5" stroke="#08090d" stroke-width="2"></circle>
+<circle cx="680" cy="71" fill="#38BDF8" r="4" stroke="#08090d" stroke-width="2"></circle>
+<circle cx="820" cy="61" fill="#818CF8" r="4" stroke="#08090d" stroke-width="2"></circle>
+<circle cx="970" cy="50" fill="#F43F5E" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<!-- X-Axis Labels -->
+<text fill="#475569" font-size="9" x="50" y="268">Nov 12</text>
+<text fill="#475569" font-size="9" x="175" y="268">Nov 14</text>
+<text fill="#475569" font-size="9" x="300" y="268">Nov 16</text>
+<text fill="#475569" font-size="9" x="425" y="268">Nov 18</text>
+<text fill="#10B981" font-size="9" font-weight="600" x="550" y="268">Today</text>
+<text fill="#64748b" font-size="9" x="690" y="268">+24h (Nov 20)</text>
+<text fill="#64748b" font-size="9" x="830" y="268">+48h (Nov 21)</text>
+<text fill="#64748b" font-size="9" x="940" y="268">+72h (Nov 22)</text>
+</svg>
+<div class="mt-3 pt-3 border-t border-white/[0.05] flex flex-wrap items-center justify-between text-xs font-mono text-slate-400">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="text-slate-300 font-medium">Critical Window:</span>
+<span>Tomorrow 03:00 - 08:30 PKT (Severe Dawn Ground Fumigation)</span>
+</div>
+<div>
+<span>Model Loss: <strong class="text-slate-200">RMSE 14.8 µg/m³</strong> (R² = 0.914)</span>
+</div>
+</div>
+</div>
+<!-- STREAMLINED BENCHMARK METRIC CARDS (RAYCAST STYLE) -->
+<div>
+<div class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">
+          Algorithmic Ensemble Benchmark (2022–2026 Winter Validation)
+        </div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono text-xs">
+<div class="p-3.5 rounded-xl bg-white/[0.02] border border-emerald-500/30 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-white font-medium">Gradient Boost v2</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Production</span>
+</div>
+<div class="mt-3 flex items-baseline justify-between">
+<span class="text-slate-400">MAE / RMSE</span>
+<span class="text-emerald-300 font-bold">11.4 / 14.8</span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-slate-400">Hazardous Recall</span>
+<span class="text-white font-bold">96.2%</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-slate-300">Random Forest Regressor</span>
+<span class="text-[10px] text-slate-500">Backup</span>
+</div>
+<div class="mt-3 flex items-baseline justify-between">
+<span class="text-slate-400">MAE / RMSE</span>
+<span class="text-slate-300 font-bold">15.2 / 19.7</span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-slate-400">Hazardous Recall</span>
+<span class="text-slate-300 font-bold">89.0%</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-slate-300">Ridge / ElasticNet</span>
+<span class="text-[10px] text-slate-500">Linear</span>
+</div>
+<div class="mt-3 flex items-baseline justify-between">
+<span class="text-slate-400">MAE / RMSE</span>
+<span class="text-slate-300 font-bold">26.8 / 34.1</span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-slate-400">Hazardous Recall</span>
+<span class="text-amber-400 font-bold">74.1%</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-slate-300">Lag Persistence (t-24h)</span>
+<span class="text-[10px] text-slate-500">Baseline</span>
+</div>
+<div class="mt-3 flex items-baseline justify-between">
+<span class="text-slate-400">MAE / RMSE</span>
+<span class="text-slate-300 font-bold">42.3 / 56.9</span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-slate-400">Hazardous Recall</span>
+<span class="text-rose-400 font-bold">51.2%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ACTIONABLE PROTOCOLS & STATUTORY DIRECTIVES -->
+<section class="rounded-2xl glass-panel p-6 space-y-5">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.06]">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-500"></span>
+<h3 class="text-base font-semibold text-white tracking-tight">
+              Actionable Health &amp; Administrative Policy Board
+            </h3>
+<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-300">
+              Protocol Level III
+            </span>
+</div>
+<p class="text-xs text-slate-400 mt-1">
+            Automated statutory triggers for district administrations, healthcare facilities, and public school boards.
+          </p>
+</div>
+<div class="text-xs font-mono text-slate-400">
+          Next Review: <span class="text-slate-200 font-semibold">06:00 PKT (in 06h 18m)</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<div class="p-4 rounded-xl glass-card-subtle flex flex-col justify-between space-y-3 hover:border-white/[0.12] transition">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="w-7 h-7 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+<span class="material-symbols-outlined text-[16px]">school</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/20">
+                Closure Mandate
+              </span>
+</div>
+<h4 class="text-sm font-semibold text-white">School Operations</h4>
+<p class="text-xs text-slate-400 mt-1 leading-relaxed">
+              Primary &amp; secondary classes suspended; shift to remote pedagogy until sustained AQI &lt; 200.
+            </p>
+</div>
+<div class="pt-2 border-t border-white/[0.05] flex justify-between text-[11px] font-mono text-slate-500">
+<span>Section 144</span>
+<span class="text-rose-400">KP &amp; Punjab Edu</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="p-4 rounded-xl glass-card-subtle flex flex-col justify-between space-y-3 hover:border-white/[0.12] transition">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+<span class="material-symbols-outlined text-[16px]">local_hospital</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/20">
+                Triage Surge
+              </span>
+</div>
+<h4 class="text-sm font-semibold text-white">Respiratory Health</h4>
+<p class="text-xs text-slate-400 mt-1 leading-relaxed">
+              Pre-position bronchodilators, nebulizer hubs, and N95 stockpiles across major hospitals.
+            </p>
+</div>
+<div class="pt-2 border-t border-white/[0.05] flex justify-between text-[11px] font-mono text-slate-500">
+<span>Lady Reading &amp; Mayo</span>
+<span class="text-purple-400">Code Amber</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="p-4 rounded-xl glass-card-subtle flex flex-col justify-between space-y-3 hover:border-white/[0.12] transition">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+<span class="material-symbols-outlined text-[16px]">precision_manufacturing</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/20">
+                70% Curfew
+              </span>
+</div>
+<h4 class="text-sm font-semibold text-white">Industrial Kilns</h4>
+<p class="text-xs text-slate-400 mt-1 leading-relaxed">
+              Non-zigzag brick kilns and heavy particulate emitters halted immediately. Steel rerolling nighttime bans.
+            </p>
+</div>
+<div class="pt-2 border-t border-white/[0.05] flex justify-between text-[11px] font-mono text-slate-500">
+<span>EPD Squads</span>
+<span class="text-amber-400">Active Patrol</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="p-4 rounded-xl glass-card-subtle flex flex-col justify-between space-y-3 hover:border-white/[0.12] transition">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400">
+<span class="material-symbols-outlined text-[16px]">traffic</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/20">
+                Odd-Even Rotation
+              </span>
+</div>
+<h4 class="text-sm font-semibold text-white">Vehicular Rationing</h4>
+<p class="text-xs text-slate-400 mt-1 leading-relaxed">
+              Odd-number license registration transit only on Mall Road, Ring Road &amp; GT corridor. Heavy cargo diverted.
+            </p>
+</div>
+<div class="pt-2 border-t border-white/[0.05] flex justify-between text-[11px] font-mono text-slate-500">
+<span>Traffic Wardens</span>
+<span class="text-sky-400">Rerouted</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- MINIMALIST FOOTER -->
+<footer class="border-t border-white/[0.06] py-6 px-4 sm:px-6 lg:px-8 text-xs font-mono text-slate-500 relative z-10">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="text-slate-300 font-medium">Dhund-Khabar Atmospheric Intelligence</span>
+<span>• Autonomous Early Warning for KPK &amp; Punjab</span>
+</div>
+<div class="flex items-center gap-4 text-slate-400 text-[11px]">
+<span>Model: 0x7F2B8D</span>
+<span>US EPA 40 CFR 58</span>
+<span>Follow Provincial EPA directives</span>
+</div>
+</div>
+</footer>
+<!-- SCRIPT LOGIC FOR REGIONS & SIMULATION -->
+<script>
+    const CITY_DATA = {
+      peshawar: {
+        name: "Peshawar (پشاور)",
+        station: "PK-PWR-01 (Khyber Pass Baseline)",
+        aqi: 318,
+        tier: "Hazardous (خطرناک)",
+        tierBg: "bg-purple-500/10 text-purple-300 border-purple-500/25",
+        ringColor: "#a855f7",
+        glowColor: "rgba(168, 85, 247, 0.12)",
+        pm25: "268.4",
+        pm10: "412.0",
+        no2: "89.2",
+        co: "2.8",
+        windSpeed: 4.8,
+        windDir: "NE (55°)",
+        windDeg: 55,
+        temp: 14.2,
+        humidity: 86,
+        dewPoint: 11.9,
+        capAlt: "180 m AGL",
+        ringOffset: 150
+      },
+      lahore: {
+        name: "Lahore (لاہور)",
+        station: "PK-LHR-04 (Gulberg Grid / Mall Rd)",
+        aqi: 422,
+        tier: "Severe Critical (شدید آفت)",
+        tierBg: "bg-rose-500/15 text-rose-300 border-rose-500/30",
+        ringColor: "#f43f5e",
+        glowColor: "rgba(244, 63, 94, 0.15)",
+        pm25: "389.2",
+        pm10: "618.5",
+        no2: "114.7",
+        co: "4.1",
+        windSpeed: 2.1,
+        windDir: "NW (315°)",
+        windDeg: 315,
+        temp: 16.8,
+        humidity: 91,
+        dewPoint: 15.2,
+        capAlt: "120 m AGL",
+        ringOffset: 60
+      }
+    };
+
+    let currentCity = 'peshawar';
+
+    function setCity(cityKey) {
+      currentCity = cityKey;
+      const data = CITY_DATA[cityKey];
+
+      const btnPwr = document.getElementById('tab-pwr');
+      const btnLhr = document.getElementById('tab-lhr');
+      if (cityKey === 'peshawar') {
+        btnPwr.className = "city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/[0.1] text-white shadow-sm font-sans";
+        btnLhr.className = "city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-slate-400 hover:text-slate-200 font-sans";
+      } else {
+        btnLhr.className = "city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/[0.1] text-white shadow-sm font-sans";
+        btnPwr.className = "city-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-slate-400 hover:text-slate-200 font-sans";
+      }
+
+      document.getElementById('station-id').innerText = data.station;
+      document.getElementById('card-city-label').innerText = data.name + " Valley Inversion AQI";
+      document.getElementById('hero-aqi-num').innerText = data.aqi;
+      
+      const tierBadge = document.getElementById('hero-tier-badge');
+      tierBadge.innerText = data.tier;
+      tierBadge.className = "px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide border transition-all " + data.tierBg;
+
+      const circle = document.getElementById('hero-gauge-circle');
+      circle.style.stroke = data.ringColor;
+      circle.style.strokeDashoffset = data.ringOffset;
+
+      document.getElementById('ambient-hazard-glow').style.background = data.glowColor;
+
+      document.getElementById('spec-pm25').innerText = data.pm25;
+      document.getElementById('spec-pm10').innerText = data.pm10;
+      document.getElementById('spec-no2').innerText = data.no2;
+      document.getElementById('spec-co').innerText = data.co;
+
+      document.getElementById('val-pm25').innerText = data.pm25;
+      document.getElementById('val-wind-speed').innerText = data.windSpeed;
+      document.getElementById('val-wind-dir').innerText = data.windDir;
+      document.getElementById('wind-needle').style.transform = `rotate(${data.windDeg}deg)`;
+      document.getElementById('val-temp').innerText = data.temp;
+      document.getElementById('val-humidity').innerText = data.humidity;
+      document.getElementById('val-dewpoint').innerText = data.dewPoint;
+      document.getElementById('val-cap-alt').innerText = data.capAlt;
+
+      document.getElementById('sim-wind-slider').value = data.windSpeed;
+      document.getElementById('sim-temp-slider').value = data.temp;
+      document.getElementById('sim-emiss-slider').value = 0;
+      runSimulation();
+    }
+
+    function setHorizon(hours, btn) {
+      document.querySelectorAll('.horizon-btn').forEach(b => {
+        b.className = "horizon-btn px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200 text-slate-400 hover:text-white";
+      });
+      btn.className = "horizon-btn px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200 bg-white/[0.1] text-white";
+      document.getElementById('forecast-target-time').innerText = `Target: +${hours}h Horizon`;
+    }
+
+    function runSimulation() {
+      const baseAqi = CITY_DATA[currentCity].aqi;
+      const wind = parseFloat(document.getElementById('sim-wind-slider').value);
+      const temp = parseFloat(document.getElementById('sim-temp-slider').value);
+      const emissionCut = parseFloat(document.getElementById('sim-emiss-slider').value);
+
+      document.getElementById('sim-wind-val').innerText = `${wind.toFixed(1)} km/h`;
+      document.getElementById('sim-temp-val').innerText = `${temp.toFixed(1)} °C`;
+      document.getElementById('sim-emiss-val').innerText = `${emissionCut}% ${emissionCut > 0 ? 'Throttled' : '(Full)'}`;
+
+      const baseWind = CITY_DATA[currentCity].windSpeed;
+      const baseTemp = CITY_DATA[currentCity].temp;
+
+      const windEffect = (wind - baseWind) * -8.5; 
+      const tempEffect = (temp - baseTemp) * -4.2;
+      const emissionEffect = (emissionCut / 100) * (baseAqi * 0.55);
+
+      let projectedAqi = Math.round(baseAqi + windEffect + tempEffect - emissionEffect);
+      if (projectedAqi < 25) projectedAqi = 25;
+      if (projectedAqi > 650) projectedAqi = 650;
+
+      const delta = projectedAqi - baseAqi;
+      const deltaPct = ((delta / baseAqi) * 100).toFixed(1);
+
+      document.getElementById('sim-result-aqi').innerText = projectedAqi;
+      
+      const deltaElem = document.getElementById('sim-result-delta');
+      if (delta < 0) {
+        deltaElem.innerText = `${delta} pts (${deltaPct}%) Improved`;
+        deltaElem.className = "text-emerald-400 font-semibold";
+      } else if (delta > 0) {
+        deltaElem.innerText = `+${delta} pts (+${deltaPct}%) Elevated`;
+        deltaElem.className = "text-rose-400 font-semibold";
+      } else {
+        deltaElem.innerText = `0 pts (Baseline)`;
+        deltaElem.className = "text-slate-300 font-semibold";
+      }
+
+      const tierBadge = document.getElementById('sim-result-tier');
+      const advBox = document.getElementById('sim-advisory-text');
+
+      if (projectedAqi > 400) {
+        tierBadge.innerText = "Severe Critical";
+        tierBadge.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
+        advBox.innerText = "Severe particulate saturation. Complete public curfew, outdoor manual work prohibited, ICU respiratory bed overflow anticipated.";
+      } else if (projectedAqi > 300) {
+        tierBadge.innerText = "Hazardous";
+        tierBadge.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30";
+        advBox.innerText = "Severe inversion trapping persists. Complete school closure mandatory; hospital nebulizer demand exceeding surge thresholds.";
+      } else if (projectedAqi > 200) {
+        tierBadge.innerText = "Very Unhealthy";
+        tierBadge.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20";
+        advBox.innerText = "Avoid all outdoor physical exertion. N95 respirator masks mandatory for traffic and municipal field workers.";
+      } else if (projectedAqi > 100) {
+        tierBadge.innerText = "Unhealthy / USG";
+        tierBadge.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20";
+        advBox.innerText = "Sensitive cohorts (asthma, COPD, children) must remain indoors. Industrial filtration units active.";
+      } else {
+        tierBadge.innerText = "Moderate / Good";
+        tierBadge.className = "px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/25";
+        advBox.innerText = "Inversion cap breached; atmospheric dispersion index optimal. Regular civic routines can resume.";
+      }
+    }
+
+    function applyPreset(type) {
+      if (type === 'rain') {
+        document.getElementById('sim-wind-slider').value = 18.0;
+        document.getElementById('sim-temp-slider').value = 21.0;
+        document.getElementById('sim-emiss-slider').value = 20;
+      } else if (type === 'lockdown') {
+        document.getElementById('sim-emiss-slider').value = 65;
+      }
+      runSimulation();
+    }
+
+    function resetSimulation() {
+      const data = CITY_DATA[currentCity];
+      document.getElementById('sim-wind-slider').value = data.windSpeed;
+      document.getElementById('sim-temp-slider').value = data.temp;
+      document.getElementById('sim-emiss-slider').value = 0;
+      runSimulation();
+    }
+
+    function refreshTelemetry() {
+      const btn = document.getElementById('btn-live-pulse');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      icon.classList.add('animate-spin');
+      setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' PKT';
+        document.getElementById('live-timestamp').innerText = `Synced ${timeStr}`;
+      }, 500);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      runSimulation();
+    });
+  </script>
+</body></html>

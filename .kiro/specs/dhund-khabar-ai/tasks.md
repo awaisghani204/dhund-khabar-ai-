@@ -170,34 +170,34 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - Run `python scripts/train_all.py --figures-only`; list the PNG files in `results/figures/` and open a sample to check the dark theme and tier bands
     - _Requirements: 2.1, 14.7_
 
-- [~] 8. Checkpoint: Phase 4 complete
+- [x] 8. Checkpoint: Phase 4 complete
   - Stop implementation. List every saved figure and show the key figures (actual vs predicted with tier bands, heatmap, feature importance, scatter, city comparison) produced from the real models
   - Wait for the user to reply "continue"
   - _Requirements: 4.2, 4.3_
 
-- [ ] 9. Phase 5a: Stitch dashboard design
-  - [~] 9.1 Create the Stitch project and design system
+- [x] 9. Phase 5a: Stitch dashboard design
+  - [x] 9.1 Create the Stitch project and design system
     - Load and call `tool::stitch-trainer::create_project` with title "Dhund-Khabar AI Dashboard"
     - Create the design system (`create_design_system` or `create_design_system_from_design_md`) with background #0B0F19, surface #161F30, 1px border #2A3B53, cyan #00F2FE, amber #FFB300, crimson #FF3366, violet #9933FF, the six EPA tier colours, Outfit (or Inter) for headings and numbers, Plus Jakarta Sans for body, system-ui fallback, 16px rounded cards, glass effect, dark mode; apply it with `apply_design_system`
     - If any Stitch call fails, report the exact error and wait for the user's direction
     - _Requirements: 15.1, 15.4, 16.1, 16.2, 16.3_
 
-  - [~] 9.2 Generate the dashboard screen
+  - [x] 9.2 Generate the dashboard screen
     - Call `generate_screen_from_text` (desktop) with a prompt listing the seven layout sections in order: (1) header "Dhund-Khabar AI (دُھند خبر)" with the "Latest Available Data: … | Peshawar vs. Lahore" badge labelled historical; (2) Peshawar / Lahore segmented toggle with two summary cards and the 24 / 48 / 72 horizon selector; (3) semi-gauge hero AQI card tinted by tier with a pulse state; (4) PM2.5, wind (rotated arrow), and thermal inversion cards; (5) What-If Simulation Lab with three sliders, scenario tier, delta, and caption; (6) Visual Analytics tabs (actual vs predicted, heatmap, feature importance, model comparison table); (7) Actionable Health & Policy Terminal checklist; plus the fixed disclaimer footer
     - _Requirements: 15.1, 17.1–17.16_
 
-  - [~] 9.3 Retrieve the generated design
+  - [x] 9.3 Retrieve the generated design
     - Call `get_screen`, then `download_file` for the HTML and the screenshot; save them under `docs/stitch/` for the review and the later adaptation
     - _Requirements: 15.2_
 
-- [~] 10. Checkpoint: Stitch design review
+- [x] 10. Checkpoint: Stitch design review
   - Stop implementation. Present the Stitch screenshot and a short summary of how each of the seven sections and the footer appear
   - Apply user feedback with `edit_screens` or `generate_variants`, re-download, and present again until the user approves
   - Write no dashboard code before approval. Wait for the user to approve and reply "continue"
   - _Requirements: 4.2, 4.3, 15.2, 15.4_
 
-- [ ] 11. Phase 5b: Streamlit dashboard
-  - [~] 11.1 Add the What-If helpers to `src/utils.py`
+- [x] 11. Phase 5b: Streamlit dashboard
+  - [x] 11.1 Add the What-If helpers to `src/utils.py`
     - `clamp_slider_default(value, low, high)` returning `(clipped, was_clamped)` and `build_scenario_row(base_row, wind, temp, humidity, feature_cols)` returning a one-row frame with the slider values and recomputed stagnation_flag and inversion_proxy
     - _Requirements: 17.10, 17.11, 17.12_
 
@@ -205,7 +205,7 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - In `tests/test_utils.py`: clamping below, inside, and above the range; scenario row values
     - _Requirements: 17.10, 17.11, 17.12_
 
-  - [~] 11.3 Implement the style layer, loaders, and header in `app.py`
+  - [x] 11.3 Implement the style layer, loaders, and header in `app.py`
     - `inject_css()`: one CSS string adapted from the approved Stitch HTML/CSS, Tailwind classes converted to named classes (`.dk-card`, `.dk-hero`, `.dk-badge`, `.dk-pulse`, …), Google Fonts `@import` for Outfit and Plus Jakarta Sans with system-ui fallback, hidden `#MainMenu`, `header`, `footer`, responsive columns, injected with `st.markdown(unsafe_allow_html=True)`
     - `load_features` and `load_metrics` with `@st.cache_data`; `load_models` with `@st.cache_resource` loading saved joblib files only
     - `render_missing_file(path, script)` naming the missing file and the script that creates it
@@ -213,25 +213,25 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - Escape interpolated strings with `html.escape` and format numbers with fixed precision
     - _Requirements: 15.3, 16.1, 16.2, 16.3, 16.4, 16.5, 17.1, 17.2, 17.17, 17.18, 17.19_
 
-  - [~] 11.4 Implement the city toggle, summary cards, horizon selector, and hero card in `app.py`
+  - [x] 11.4 Implement the city toggle, summary cards, horizon selector, and hero card in `app.py`
     - City toggle with `st.segmented_control` if available in streamlit 1.42, else horizontal `st.radio` styled as a segmented control; horizon selector 24 / 48 / 72
     - `render_city_summary` for both cities side by side
     - Hero prediction from the last row with all us_aqi forecast features present, using the forecast us_aqi model for the selected city and horizon; `render_hero_card` with inline SVG semi-gauge (arc `min(aqi, 500) / 500`, real value printed), tier-tinted background, target time, and the `dk-pulse` class for Very Unhealthy and Hazardous (Emergency)
     - _Requirements: 17.3, 17.4, 17.5, 17.6_
 
-  - [~] 11.5 Implement the condition cards and What-If Simulation Lab in `app.py`
+  - [x] 11.5 Implement the condition cards and What-If Simulation Lab in `app.py`
     - `render_condition_cards`: latest pm2_5 with pm2_5_change_24h; wind_speed_10m with an arrow rotated by wind_direction_10m; inversion card from `utils.inversion_proxy` and `utils.inversion_level`, stating it is a heuristic proxy
     - `render_whatif_lab`: sliders wind 0–30 km/h, temperature 5–35 °C, humidity 20–100 % with defaults from `clamp_slider_default` and the "Observed: … (outside slider range, …)" note when clamped; scenario prediction from the simulation model via `build_scenario_row`; new tier, advisory, delta versus the baseline simulation prediction at observed values; the caption "Scenario exploration from a statistical model, not a physical simulation."
     - _Requirements: 17.7, 17.8, 17.9, 17.10, 17.11, 17.12, 17.13_
 
-  - [~] 11.6 Implement analytics tabs, policy terminal, footer, and `main()` in `app.py`
+  - [x] 11.6 Implement analytics tabs, policy terminal, footer, and `main()` in `app.py`
     - `render_analytics_tabs`: actual vs predicted with city, horizon, and date-range controls (charts from `src/charts.py`), correlation heatmap, feature importance, model comparison table (persistence, linear, gradient boosting, random forest) from `results/metrics.csv`
     - `render_policy_terminal(advisory)`: School Operations Status, Respiratory Protective Guidance, Industrial Advisory from `get_risk_advisory`
     - `render_footer()`: "Student learning project. Not an official health warning system. Follow guidance from Pakistan's health and environmental authorities." on every view
     - `main()`: page config, CSS, then the seven sections in order and the footer; missing files show `render_missing_file` while the rest of the page still renders where possible
     - _Requirements: 17.14, 17.15, 17.16, 17.18, 17.19_
 
-  - [~] 11.7 Check the dashboard headlessly
+  - [x] 11.7 Check the dashboard headlessly
     - Run a short headless check with `streamlit.testing.v1.AppTest.from_file("app.py").run()` (for example from a temporary `python -c` command) and confirm no exceptions, and that the header, badge with the real last timestamp, caption, and footer text are present
     - Tell the user to start the server manually with `streamlit run app.py` (or `python -m streamlit run app.py`) for the visual check
     - _Requirements: 17.1, 17.13, 17.16, 17.19_

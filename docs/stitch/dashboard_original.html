@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dhund-Khabar AI — Smog Forecasting Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0B0F19;
+      --surface-card: rgba(22, 31, 48, 0.75);
+      --border-card: #2A3B53;
+      --accent-cyan: #00F2FE;
+      --accent-amber: #FFB300;
+      --hazard-crimson: #FF3366;
+      --hazard-violet: #9933FF;
+      --text-main: #E6EDF7;
+      --text-muted: #8A9BB5;
+      --epa-good: #00E400;
+      --epa-moderate: #FFFF00;
+      --epa-usg: #FF7E00;
+      --epa-unhealthy: #FF0000;
+      --epa-very-unhealthy: #8F3F97;
+      --epa-hazardous: #7E0023;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 56px; /* space for fixed footer */
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .heading-font {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .container {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Glass card pattern */
+    .glass-card {
+      background: var(--surface-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+
+    /* Section header with cyan accent bar */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background-color: var(--accent-cyan);
+      border-radius: 2px;
+    }
+
+    /* Pills & badges */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border-card);
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pill-cyan {
+      border-color: rgba(0, 242, 254, 0.3);
+      background: rgba(0, 242, 254, 0.08);
+      color: var(--accent-cyan);
+    }
+
+    .pill-muted {
+      border-color: var(--border-card);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+    }
+
+    .label-caps {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    /* Header */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(42, 59, 83, 0.4);
+    }
+
+    .header-title-block h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .header-title-block p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-status-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Segmented Controls */
+    .segmented-control {
+      display: inline-flex;
+      background: rgba(11, 15, 25, 0.6);
+      border: 1px solid var(--border-card);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .segmented-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .segmented-btn.active {
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--accent-cyan);
+      box-shadow: inset 0 0 0 1px rgba(0, 242, 254, 0.4);
+    }
+
+    /* City & Horizon Row */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .city-summary-card {
+      background: rgba(22, 31, 48, 0.5);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .city-summary-card.active-city {
+      border-color: rgba(0, 242, 254, 0.4);
+      background: rgba(0, 242, 254, 0.04);
+    }
+
+    /* HERO AQI Card & Pulse Glow */
+    @keyframes hazardPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.4), 0 0 24px 2px rgba(153, 51, 255, 0.25);
+      }
+      50% {
+        box-shadow: 0 0 0 6px rgba(255, 51, 102, 0.12), 0 0 45px 8px rgba(153, 51, 255, 0.45);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.4), 0 0 24px 2px rgba(153, 51, 255, 0.25);
+      }
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(143, 63, 151, 0.18) 0%, rgba(22, 31, 48, 0.85) 100%);
+      border: 1px solid rgba(143, 63, 151, 0.45);
+      animation: hazardPulse 4s infinite ease-in-out;
+      text-align: center;
+      padding: 32px 24px 28px;
+    }
+
+    .hero-content-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-aqi-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-main);
+      margin: 4px 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .tier-very-unhealthy {
+      color: #D67AE2;
+      background: rgba(143, 63, 151, 0.25);
+      border: 1px solid rgba(143, 63, 151, 0.6);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+    }
+
+    /* Conditions Row: 3 columns */
+    .conditions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .condition-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 12px 0 6px;
+    }
+
+    /* Compass circle */
+    .compass-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 8px 0;
+    }
+
+    .compass-dial {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-card);
+      position: relative;
+      background: rgba(11, 15, 25, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compass-needle {
+      position: absolute;
+      width: 2px;
+      height: 36px;
+      background: linear-gradient(to top, transparent 50%, var(--accent-cyan) 50%);
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .compass-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      position: absolute;
+    }
+
+    /* Sliders & Simulation Lab */
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-track-wrap {
+      position: relative;
+      height: 6px;
+      background: var(--border-card);
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    .slider-fill {
+      height: 100%;
+      background: var(--accent-cyan);
+      border-radius: 4px;
+      width: 45%;
+      position: relative;
+    }
+
+    .slider-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      position: absolute;
+      right: -8px;
+      top: -5px;
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+      cursor: pointer;
+    }
+
+    .sim-result-box {
+      background: rgba(11, 15, 25, 0.5);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Tabs & Analytics */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-card);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .tab-item {
+      padding: 10px 16px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-item.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    .chart-placeholder-box {
+      height: 220px;
+      background: rgba(11, 15, 25, 0.4);
+      border: 1px dashed var(--border-card);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    /* Telemetry Data Table */
+    .telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .telemetry-table th {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-card);
+    }
+
+    .telemetry-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(42, 59, 83, 0.5);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .telemetry-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Health & Policy Checklist */
+    .checklist-row {
+      background: rgba(11, 15, 25, 0.4);
+      border: 1px solid var(--border-card);
+      border-left: 3px solid var(--border-card);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .checklist-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .checklist-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .status-icon-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(42, 59, 83, 0.35);
+      border: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .fixed-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: var(--bg-page);
+      border-top: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    .fixed-footer p {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Thin line icon helper */
+    .icon {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: middle;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="container">
+
+    <!-- 1. HEADER -->
+    <header class="header-bar">
+      <div class="header-title-block">
+        <h1>Dhund-Khabar AI (دُھند خبر)</h1>
+        <p>Smog forecasting for Peshawar and Lahore</p>
+      </div>
+      <div class="header-status-group">
+        <div class="pill pill-cyan">
+          <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          Latest Available Data: 2026-11-19 23:00 | Peshawar vs. Lahore
+        </div>
+        <div class="pill pill-muted">
+          Historical dataset
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. CITY AND HORIZON CONTROLS -->
+    <section>
+      <div class="controls-grid">
+        <!-- City segmented toggle -->
+        <div style="grid-column: span 12; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="label-caps">Target City</span>
+            <div class="segmented-control">
+              <button class="segmented-btn active" type="button">Peshawar</button>
+              <button class="segmented-btn" type="button">Lahore</button>
+            </div>
+          </div>
+          <!-- Horizon Selector -->
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="label-caps">Forecast horizon</span>
+            <div class="segmented-control">
+              <button class="segmented-btn active" type="button">24 h</button>
+              <button class="segmented-btn" type="button">48 h</button>
+              <button class="segmented-btn" type="button">72 h</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary card: Peshawar -->
+        <div class="city-summary-card active-city" style="grid-column: span 6;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="heading-font" style="font-size: 16px; font-weight: 600; color: var(--accent-cyan);">Peshawar</span>
+              <span class="pill pill-cyan" style="font-size: 10px; padding: 2px 8px;">Selected</span>
+            </div>
+            <div style="display: flex; gap: 16px; margin-top: 8px; color: var(--text-muted); font-size: 13px;">
+              <span class="heading-font">US AQI <strong style="color: var(--text-main);">---</strong></span>
+              <span class="heading-font">PM2.5 <strong style="color: var(--text-main);">--- µg/m³</strong></span>
+            </div>
+          </div>
+          <div>
+            <span class="pill pill-muted heading-font">Tier —</span>
+          </div>
+        </div>
+
+        <!-- Summary card: Lahore -->
+        <div class="city-summary-card" style="grid-column: span 6;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="heading-font" style="font-size: 16px; font-weight: 600; color: var(--text-main);">Lahore</span>
+            </div>
+            <div style="display: flex; gap: 16px; margin-top: 8px; color: var(--text-muted); font-size: 13px;">
+              <span class="heading-font">US AQI <strong style="color: var(--text-main);">---</strong></span>
+              <span class="heading-font">PM2.5 <strong style="color: var(--text-main);">--- µg/m³</strong></span>
+            </div>
+          </div>
+          <div>
+            <span class="pill pill-muted heading-font">Tier —</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. HERO AQI CARD -->
+    <section class="glass-card hero-card">
+      <div class="hero-content-wrapper">
+        <span class="label-caps" style="color: var(--text-muted); margin-bottom: 8px;">Predicted US AQI</span>
+
+        <!-- Semi-circular 180° EPA Tier Gauge (SVG) -->
+        <svg viewBox="0 0 320 175" style="width: 290px; overflow: visible;">
+          <defs>
+            <filter id="markerGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#8F3F97" flood-opacity="0.9" />
+            </filter>
+          </defs>
+          <!-- Background Track -->
+          <path d="M 30 160 A 130 130 0 0 1 290 160" fill="none" stroke="#2A3B53" stroke-width="16" stroke-linecap="round" />
+          
+          <!-- Six EPA Tier Segments: Good, Moderate, USG, Unhealthy, Very Unhealthy, Hazardous -->
+          <!-- 180° arc split into 6 chunks of 30° each -->
+          <!-- Segment 1: Good #00E400 (180° to 150°) -->
+          <path d="M 30 160 A 130 130 0 0 1 47.4 95" fill="none" stroke="#00E400" stroke-width="12" stroke-dasharray="1 1" />
+          <path d="M 30 160 A 130 130 0 0 1 47.4 95" fill="none" stroke="#00E400" stroke-width="12" />
+          <!-- Segment 2: Moderate #FFFF00 (150° to 120°) -->
+          <path d="M 47.4 95 A 130 130 0 0 1 95 47.4" fill="none" stroke="#FFFF00" stroke-width="12" />
+          <!-- Segment 3: USG #FF7E00 (120° to 90°) -->
+          <path d="M 95 47.4 A 130 130 0 0 1 160 30" fill="none" stroke="#FF7E00" stroke-width="12" />
+          <!-- Segment 4: Unhealthy #FF0000 (90° to 60°) -->
+          <path d="M 160 30 A 130 130 0 0 1 225 47.4" fill="none" stroke="#FF0000" stroke-width="12" />
+          <!-- Segment 5: Very Unhealthy #8F3F97 (60° to 30°) -->
+          <path d="M 225 47.4 A 130 130 0 0 1 272.6 95" fill="none" stroke="#8F3F97" stroke-width="14" />
+          <!-- Segment 6: Hazardous #7E0023 (30° to 0°) -->
+          <path d="M 272.6 95 A 130 130 0 0 1 290 160" fill="none" stroke="#7E0023" stroke-width="12" stroke-linecap="round" />
+
+          <!-- Active Marker positioned on Very Unhealthy segment (approx 45° angle) -->
+          <!-- x = 160 + 130 * cos(45°) ≈ 251.9, y = 160 - 130 * sin(45°) ≈ 68 -->
+          <circle cx="251.9" cy="68" r="9" fill="#0B0F19" stroke="#E6EDF7" stroke-width="3" filter="url(#markerGlow)" />
+          <circle cx="251.9" cy="68" r="4" fill="#8F3F97" />
+        </svg>
+
+        <div class="hero-aqi-value">---</div>
+
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+          <span class="pill tier-very-unhealthy">Very Unhealthy</span>
+          <span class="pill pill-muted" style="font-size: 11px; padding: 2px 8px;">example state</span>
+        </div>
+
+        <div style="color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; gap: 4px;">
+          <span>Target time: — (+24 h)</span>
+          <span style="font-size: 12px; opacity: 0.85;">Forecast model output</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CONDITIONS ROW -->
+    <section>
+      <div class="section-title">Atmospheric Conditions</div>
+      <div class="conditions-grid">
+        <!-- a. PM2.5 Card -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="heading-font" style="font-size: 16px; font-weight: 600; color: var(--text-main);">PM2.5 Mass Concentration</span>
+            <span class="pill pill-muted" style="font-size: 11px;">Aerosol</span>
+          </div>
+          <div class="condition-value">--- <span style="font-size: 16px; font-weight: 400; color: var(--text-muted);">µg/m³</span></div>
+          <div style="display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            <span>Change vs 24 h earlier: <strong>—</strong></span>
+          </div>
+        </div>
+
+        <!-- b. Wind Card -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="heading-font" style="font-size: 16px; font-weight: 600; color: var(--text-main);">Wind Vector</span>
+            <span class="pill pill-muted" style="font-size: 11px;">Surface</span>
+          </div>
+          <div class="compass-wrapper">
+            <div class="compass-dial">
+              <div class="compass-needle"></div>
+              <div class="compass-dot"></div>
+            </div>
+            <div>
+              <div class="condition-value" style="margin: 0;">--- <span style="font-size: 16px; font-weight: 400; color: var(--text-muted);">km/h</span></div>
+              <div style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">
+                Direction: <strong class="heading-font" style="color: var(--text-main);">— °</strong> <span class="pill pill-muted" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">NE example (45°)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- c. Thermal Inversion Card -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="heading-font" style="font-size: 16px; font-weight: 600; color: var(--text-main);">Thermal Inversion</span>
+            <span class="pill pill-muted" style="font-size: 11px;">Boundary layer</span>
+          </div>
+          <div style="margin: 12px 0 8px;">
+            <span class="pill pill-muted" style="border-color: rgba(255, 179, 0, 0.4); color: var(--accent-amber); font-family: 'Outfit', sans-serif;">
+              Inversion risk: —
+            </span>
+          </div>
+          <div style="display: flex; gap: 16px; color: var(--text-main); font-size: 13px; margin-bottom: 8px;">
+            <span class="heading-font">Temp: <strong style="color: var(--text-main);">— °C</strong></span>
+            <span class="heading-font">RH: <strong style="color: var(--text-main);">— %</strong></span>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+            Heuristic proxy from temperature and humidity, not a measured inversion.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. WHAT-IF SIMULATION LAB -->
+    <section class="glass-card">
+      <div class="section-title">What-If Simulation Lab</div>
+      <div class="sim-grid">
+        <!-- Sliders Left Column -->
+        <div>
+          <!-- Slider 1 -->
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="heading-font" style="font-weight: 500; font-size: 14px;">Wind speed (0–30 km/h)</span>
+              <span class="heading-font" style="color: var(--accent-cyan); font-weight: 600;">—</span>
+            </div>
+            <div class="slider-track-wrap">
+              <div class="slider-fill" style="width: 35%;">
+                <div class="slider-thumb"></div>
+              </div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Default: latest observed value</span>
+          </div>
+
+          <!-- Slider 2 -->
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="heading-font" style="font-weight: 500; font-size: 14px;">Temperature (5–35 °C)</span>
+              <span class="heading-font" style="color: var(--accent-cyan); font-weight: 600;">—</span>
+            </div>
+            <div class="slider-track-wrap">
+              <div class="slider-fill" style="width: 50%;">
+                <div class="slider-thumb"></div>
+              </div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Default: latest observed value</span>
+          </div>
+
+          <!-- Slider 3 -->
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="heading-font" style="font-weight: 500; font-size: 14px;">Humidity (20–100 %)</span>
+              <span class="heading-font" style="color: var(--accent-cyan); font-weight: 600;">—</span>
+            </div>
+            <div class="slider-track-wrap">
+              <div class="slider-fill" style="width: 65%;">
+                <div class="slider-thumb"></div>
+              </div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Default: latest observed value</span>
+          </div>
+        </div>
+
+        <!-- Result Right Column -->
+        <div class="sim-result-box">
+          <div>
+            <span class="label-caps">Counterfactual Projection</span>
+            <div class="heading-font" style="font-size: 32px; font-weight: 700; color: var(--text-main); margin: 8px 0 6px;">
+              Scenario AQI ---
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span class="pill pill-muted heading-font">Tier —</span>
+              <span class="heading-font" style="color: var(--accent-amber); font-weight: 600; font-size: 13px;">Δ vs baseline: —</span>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--border-card); padding-top: 12px; margin-top: 12px;">
+            <span class="label-caps" style="font-size: 10px;">Projected Advisory</span>
+            <div style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; border-top: 1px solid rgba(42, 59, 83, 0.5); padding-top: 12px;">
+        <p style="font-size: 12px; color: var(--text-muted); font-style: italic;">
+          Scenario exploration from a statistical model, not a physical simulation.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. VISUAL ANALYTICS -->
+    <section class="glass-card">
+      <div class="section-title">Visual Analytics</div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tab-item active">Actual vs Predicted</div>
+        <div class="tab-item">Correlation Heatmap</div>
+        <div class="tab-item">Feature Importance</div>
+        <div class="tab-item">Model Comparison</div>
+      </div>
+
+      <!-- Tab Content Controls -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="pill pill-muted" style="cursor: pointer;">
+            City: Peshawar ▾
+          </div>
+          <div class="pill pill-muted" style="cursor: pointer;">
+            Horizon: 24 h ▾
+          </div>
+          <div class="pill pill-muted" style="cursor: pointer;">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Date Range: Last 30 Days ▾
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; font-size: 12px; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 16px; height: 2px; background: rgba(230, 237, 247, 0.6); display: inline-block;"></span>
+            <span style="color: var(--text-muted);">Actual</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 16px; height: 2px; background: var(--accent-cyan); display: inline-block; box-shadow: 0 0 6px var(--accent-cyan);"></span>
+            <span style="color: var(--accent-cyan);">Predicted</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Chart Area Placeholder -->
+      <div class="chart-placeholder-box">
+        <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5" style="color: var(--border-card); margin-bottom: 8px;">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span class="heading-font" style="color: var(--text-muted); font-size: 13px;">Telemetry Timeseries Graph (Runtime Populated)</span>
+        <span style="color: var(--text-muted); opacity: 0.6; font-size: 11px; margin-top: 2px;">Waiting for dataset model ingestion —</span>
+      </div>
+
+      <!-- Model Comparison Preview Table -->
+      <div style="margin-top: 16px;">
+        <div class="heading-font" style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 10px;">
+          Model Comparison Baseline
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="telemetry-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>MAE</th>
+                <th>RMSE</th>
+                <th>R²</th>
+                <th>Tier Accuracy</th>
+                <th>Unhealthy Recall</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">Persistence</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">Linear Regression</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">Gradient Boosting</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">Random Forest</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. ACTIONABLE HEALTH & POLICY TERMINAL -->
+    <section class="glass-card">
+      <div class="section-title">Actionable Health &amp; Policy Terminal</div>
+      <div>
+        <!-- Row 1: School Operations Status -->
+        <div class="checklist-row">
+          <div class="checklist-left">
+            <div class="status-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            </div>
+            <div>
+              <div class="heading-font" style="font-size: 15px; font-weight: 600; color: var(--text-main);">
+                School Operations Status
+              </div>
+              <div style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">
+                Advisory status: <strong style="color: var(--text-main);">—</strong>
+              </div>
+            </div>
+          </div>
+          <span class="pill pill-muted heading-font">Standard Protocol</span>
+        </div>
+
+        <!-- Row 2: Respiratory Protective Guidance -->
+        <div class="checklist-row">
+          <div class="checklist-left">
+            <div class="status-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div>
+              <div class="heading-font" style="font-size: 15px; font-weight: 600; color: var(--text-main);">
+                Respiratory Protective Guidance
+              </div>
+              <div style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">
+                Advisory status: <strong style="color: var(--text-main);">—</strong>
+              </div>
+            </div>
+          </div>
+          <span class="pill pill-muted heading-font">Standard Protocol</span>
+        </div>
+
+        <!-- Row 3: Industrial Advisory -->
+        <div class="checklist-row">
+          <div class="checklist-left">
+            <div class="status-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <div>
+              <div class="heading-font" style="font-size: 15px; font-weight: 600; color: var(--text-main);">
+                Industrial Advisory
+              </div>
+              <div style="color: var(--text-muted); font-size: 13px; margin-top: 2px;">
+                Advisory status: <strong style="color: var(--text-main);">—</strong>
+              </div>
+            </div>
+          </div>
+          <span class="pill pill-muted heading-font">Standard Protocol</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FIXED FOOTER -->
+  <footer class="fixed-footer">
+    <p>Student learning project. Not an official health warning system. Follow guidance from Pakistan's health and environmental authorities.</p>
+  </footer>
+
+</body>
+</html>

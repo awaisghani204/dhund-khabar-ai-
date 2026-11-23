@@ -1,0 +1,122 @@
+{
+  "project": {
+    "name": "projects/2753126111242902468",
+    "id": "2753126111242902468",
+    "title": "Dhund-Khabar AI Dashboard",
+    "visibility": "PRIVATE",
+    "createTime": "2026-11-23T08:15:49.269398Z"
+  },
+  "design_system": {
+    "name": "assets/5576147302249970983",
+    "asset_id": "5576147302249970983",
+    "display_name": "Dhund-Khabar Smog Telemetry (Dark Glass)",
+    "version": "1"
+  },
+  "device_type": "DESKTOP",
+  "color_mode": "DARK",
+  "status": {
+    "create_project": "ok",
+    "create_design_system": "ok (asset listed under the project by list_design_systems)",
+    "update_design_system": "failed: MCP tool error: Request contains an invalid argument.",
+    "user_decision": "Keep as is, apply in 9.2: no retry of update_design_system; apply asset 5576147302249970983 to the dashboard screen in 9.2 and repeat Outfit + hex values in the screen prompt",
+    "generate_screen_from_text": "ok (task 9.2): screen c0b225a4172e454891555481093ca978, status COMPLETE, designSystem assets/5576147302249970983 passed in the request",
+    "list_screens_after_generate": "{} (empty response, polled twice 30 s apart)",
+    "get_project_screen_instances": "none listed; the screen id was used as the instance id for apply_design_system",
+    "apply_design_system": "ok (task 9.2): created themed screen 848dc84695fd4e349433d61c947b4f09 (generatedBy polish_edit_theme_agent, status COMPLETE)",
+    "project_designTheme_after_apply": "populated: colorMode DARK, roundness ROUND_TWELVE, primary #00F2FE, secondary #FFB300, tertiary #FF3366, neutral #0B0F19, bodyFont PLUS_JAKARTA_SANS, designMd stored; headlineFont still not echoed",
+    "get_screen": "ok (task 9.3): 848dc84695fd4e349433d61c947b4f09, 2560 x 5080, DESKTOP, screenType DESIGN",
+    "download_file": "ok (task 9.3): themed -> docs/stitch/dashboard.html + dashboard.png; original -> docs/stitch/dashboard_original.html + dashboard_original.png (first original PNG call returned 'The service is currently unavailable.', retry ok)",
+    "review_finding_fonts": "themed HTML loads Public Sans + Plus Jakarta Sans from Google Fonts but not Outfit, so Outfit headings fall back to system-ui; the original HTML loads Outfit 500-700 + Plus Jakarta Sans 400/500/400i"
+  },
+  "approval": {
+    "checkpoint": "Task 10 (Stitch design review)",
+    "date": "2026-11-23",
+    "user_reply": "continue; \"I have changed the design for you in Stitch\"",
+    "approved_screen_id": "14f8d14f71a040d7849bb47166ab7f41",
+    "approved_screen_title": "Dhund-Khabar AI - Apple Inspired Atmospheric Terminal",
+    "how_identified": "list_screens now returns 4 screens. Three are new and user-made (titles not from the 9.2 prompt). Screen resources carry no updateTime; the screenshot file ids embed an increasing hex timestamp prefix (000660ee72f7... console < 000660ee8985... modern < 000660ee9ac5... apple), so the Apple screen is the latest. Project updateTime 2026-11-23T09:56:47Z. The three screens are successive versions of the same redesign (same content and mock numbers).",
+    "previous_screens": "848dc84695fd4e349433d61c947b4f09 (themed) and c0b225a4172e454891555481093ca978 (original instance, now pointing at the themed screen) are unchanged",
+    "new_design_system_instances_on_canvas": ["assets/96ddf92e8f0a4e0d9619f136611b623e", "assets/9ee91c9e2823490ca6215c612dacbc11"],
+    "adaptation_notes": "see docs/stitch/design_system.md section 'Approved design (task 10)'"
+  },
+  "downloads": {
+    "approved_html": "docs/stitch/dashboard_approved.html",
+    "approved_png": "docs/stitch/dashboard_approved.png",
+    "approved_preview": "docs/stitch/dashboard_approved_preview.png",
+    "alt_modern_html": "docs/stitch/dashboard_alt_modern.html",
+    "alt_modern_png": "docs/stitch/dashboard_alt_modern.png",
+    "alt_console_html": "docs/stitch/dashboard_alt_console.html",
+    "alt_console_png": "docs/stitch/dashboard_alt_console.png",
+    "themed_html": "docs/stitch/dashboard.html",
+    "themed_png": "docs/stitch/dashboard.png",
+    "original_html": "docs/stitch/dashboard_original.html",
+    "original_png": "docs/stitch/dashboard_original.png",
+    "review_crops": ["docs/stitch/dashboard_preview_overview.png", "docs/stitch/dashboard_preview_top.png", "docs/stitch/dashboard_original_preview_top.png"]
+  },
+  "screens": [
+    {
+      "role": "APPROVED user-edited dashboard (latest of three user versions)",
+      "id": "14f8d14f71a040d7849bb47166ab7f41",
+      "name": "projects/2753126111242902468/screens/14f8d14f71a040d7849bb47166ab7f41",
+      "title": "Dhund-Khabar AI - Apple Inspired Atmospheric Terminal",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 4958,
+      "screenshot_file": "projects/2753126111242902468/files/screenshot_000660ee9ac537760479fc39170ed1b0",
+      "html_file": "projects/2753126111242902468/files/14f8d14f71a040d7849bb47166ab7f41"
+    },
+    {
+      "role": "user version 2 (alternative, not approved)",
+      "id": "670548a476db43a6bbf42247a337716b",
+      "name": "projects/2753126111242902468/screens/670548a476db43a6bbf42247a337716b",
+      "title": "Dhund-Khabar AI - Modern Atmospheric Intelligence",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 4680,
+      "screenshot_file": "projects/2753126111242902468/files/screenshot_000660ee898532c504e74d20170761bb",
+      "html_file": "projects/2753126111242902468/files/670548a476db43a6bbf42247a337716b"
+    },
+    {
+      "role": "user version 1 (alternative, not approved)",
+      "id": "49559a98c1184a47b050192ce1fe6c26",
+      "name": "projects/2753126111242902468/screens/49559a98c1184a47b050192ce1fe6c26",
+      "title": "Dhund-Khabar AI - Smog Intelligence Console",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 5010,
+      "screenshot_file": "projects/2753126111242902468/files/screenshot_000660ee72f71e150356cb0066229960",
+      "html_file": "projects/2753126111242902468/files/49559a98c1184a47b050192ce1fe6c26"
+    },
+    {
+      "role": "themed dashboard (use this one for review in 9.3)",
+      "id": "848dc84695fd4e349433d61c947b4f09",
+      "name": "projects/2753126111242902468/screens/848dc84695fd4e349433d61c947b4f09",
+      "title": "Dhund-Khabar AI Dashboard",
+      "generatedBy": "polish_edit_theme_agent",
+      "source": "apply_design_system on c0b225a4172e454891555481093ca978",
+      "apply_session_id": "14584859446730461384",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 5080,
+      "screenshot_file": "projects/2753126111242902468/files/796be0974c0f4ce0a72e2a4a97c9bb3a",
+      "screenshot_download_url": "https://stitch.googleapis.com/v1/projects/2753126111242902468/files/796be0974c0f4ce0a72e2a4a97c9bb3a:download",
+      "html_file": "projects/2753126111242902468/files/7fc572af6edf457488cc114971759e3c",
+      "html_download_url": "https://stitch.googleapis.com/v1/projects/2753126111242902468/files/7fc572af6edf457488cc114971759e3c:download"
+    },
+    {
+      "role": "original generated dashboard (before apply_design_system)",
+      "id": "c0b225a4172e454891555481093ca978",
+      "name": "projects/2753126111242902468/screens/c0b225a4172e454891555481093ca978",
+      "title": "Dhund-Khabar AI Dashboard",
+      "generatedBy": "create_datastore_entry",
+      "generate_session_id": "12543625459390074721",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 5082,
+      "screenshot_file": "projects/2753126111242902468/files/2938a26aa1444e0a9d50c4640ae79eba",
+      "screenshot_download_url": "https://stitch.googleapis.com/v1/projects/2753126111242902468/files/2938a26aa1444e0a9d50c4640ae79eba:download",
+      "html_file": "projects/2753126111242902468/files/0a80bec6176b44dca61ab39cee1ee341",
+      "html_download_url": "https://stitch.googleapis.com/v1/projects/2753126111242902468/files/0a80bec6176b44dca61ab39cee1ee341:download"
+    }
+  ]
+}
