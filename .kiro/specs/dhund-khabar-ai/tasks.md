@@ -236,119 +236,119 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - Tell the user to start the server manually with `streamlit run app.py` (or `python -m streamlit run app.py`) for the visual check
     - _Requirements: 17.1, 17.13, 17.16, 17.19_
 
-- [~] 12. Checkpoint: Phase 5 complete
+- [x] 12. Checkpoint: Phase 5 complete
   - Stop implementation. Summarize how the approved Stitch design was adapted, list the seven sections and the footer as implemented, show the headless check output, and give the exact command to start the dashboard
   - Wait for the user to reply "continue"
   - _Requirements: 4.2, 4.3_
 
-- [ ] 13. Phase 6: Complete test suite
+- [x] 13. Phase 6: Complete test suite
   - Extend or replace the optional quick tests from earlier phases so the files below contain the complete required list. Every property test runs at least 100 seeded cases with `np.random.default_rng(42)`, uses only synthetic data, and carries the docstring tag `Feature: dhund-khabar-ai, Property {n}: {title}`. Hypothesis is not used.
-  - [~] 13.1 Write the shared fixtures in `tests/conftest.py`
+  - [x] 13.1 Write the shared fixtures in `tests/conftest.py`
     - `make_synthetic_master(n_hours_per_city, start, seed)` with all 26 Required_Columns in file order, correct `time` and `datetime` string formats, weekday-name day_of_week, non-negative pollutants
     - `boundary_frame` (two cities hourly 2024-12-20 00:00 to 2025-01-10 23:00) and `tiny_model_data` (300 rows × 8 numeric features); a `tmp_path`-based helper to write synthetic CSVs
     - _Requirements: 2.2_
 
-  - [~] 13.2 Write property test for load validation, ordering, and city filter
+  - [x] 13.2 Write property test for load validation, ordering, and city filter
     - **Property 18: Load validation, ordering, and city filter**
     - **Validates: Requirements 6.3, 6.4, 6.6, 18.1**
 
-  - [~] 13.3 Write property test for cross-city leakage
+  - [x] 13.3 Write property test for cross-city leakage
     - **Property 1: No cross-city leakage**
     - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 18.2**
 
-  - [~] 13.4 Write property test for past-only features
+  - [x] 13.4 Write property test for past-only features
     - **Property 2: Past-only lag and rolling features**
     - **Validates: Requirements 8.9, 18.3**
 
-  - [~] 13.5 Write property test for cyclical time features
+  - [x] 13.5 Write property test for cyclical time features
     - **Property 4: Cyclical time features are bounded and consistent**
     - **Validates: Requirements 7.1, 7.2, 18.5**
 
-  - [~] 13.6 Write property test for calendar flags
+  - [x] 13.6 Write property test for calendar flags
     - **Property 5: Calendar flags match the timestamp**
     - **Validates: Requirements 7.3, 7.4**
 
-  - [~] 13.7 Write property test for target shifts
+  - [x] 13.7 Write property test for target shifts
     - **Property 3: Target shift correctness**
     - **Validates: Requirements 9.1, 9.2, 18.4**
 
-  - [~] 13.8 Write property test for split ordering and period membership
+  - [x] 13.8 Write property test for split ordering and period membership
     - **Property 6: Split ordering and period membership**
     - **Validates: Requirements 2.5, 9.3, 9.4, 9.5, 18.6**
 
-  - [~] 13.9 Write property test for the per-horizon embargo
+  - [x] 13.9 Write property test for the per-horizon embargo
     - **Property 7: Per-horizon embargo**
     - **Validates: Requirements 9.3, 9.5**
 
-  - [~] 13.10 Write the named embargo test `test_train_rows_never_use_test_period_labels`
+  - [x] 13.10 Write the named embargo test `test_train_rows_never_use_test_period_labels`
     - In `tests/test_pipeline.py`, on `boundary_frame` for h in 24, 48, 72: `(train.datetime + h).max() < 2025-01-01`; `train.datetime.max() == 2025-01-01 − (h + 1) hours`; every training label equals the source value at t + h joined on (city, datetime + h) and that source timestamp is before 2025-01-01; `test.datetime.min() == 2025-01-01 00:00`
     - _Requirements: 9.3, 9.5, 18.6_
 
-  - [~] 13.11 Write property test for feature lists
+  - [x] 13.11 Write property test for feature lists
     - **Property 8: Feature lists never leak targets or the AQI family into PM2.5 models**
     - **Validates: Requirements 10.3, 10.5, 10.6**
 
-  - [~] 13.12 Write property test for the persistence baseline
+  - [x] 13.12 Write property test for the persistence baseline
     - **Property 16: Persistence equals the shifted target**
     - **Validates: Requirements 13.3, 18.13**
 
-  - [~] 13.13 Write the pipeline example and edge-case tests
+  - [x] 13.13 Write the pipeline example and edge-case tests
     - In `tests/test_pipeline.py`: warm-up rows dropped; unknown city `ValueError` listing cities; `filter_city` before `load_data` raises `RuntimeError`; non-hourly step `ValueError` in `create_targets`; unsorted frame `ValueError`; `prepare_train_test_split` returns a tuple; `horizon=None` uses 72; exact forecast and simulation feature lists for both targets
     - _Requirements: 6.7, 9.4, 9.6, 10.1, 10.2, 10.4_
 
-  - [~] 13.14 Write property test for prediction shape and feature importance
+  - [x] 13.14 Write property test for prediction shape and feature importance
     - **Property 13: One prediction per input row**
     - **Validates: Requirements 11.6, 11.8, 18.10**
 
-  - [~] 13.15 Write property test for the save and load round trip
+  - [x] 13.15 Write property test for the save and load round trip
     - **Property 14: Save and load round trip**
     - **Validates: Requirements 11.9, 11.10, 18.11**
 
-  - [~] 13.16 Write property test for column mismatch after load
+  - [x] 13.16 Write property test for column mismatch after load
     - **Property 15: Column mismatch is rejected after load**
     - **Validates: Requirements 11.11, 18.12**
 
-  - [~] 13.17 Write the model example and edge-case tests
+  - [x] 13.17 Write the model example and edge-case tests
     - In `tests/test_model.py`: Random Forest parameters (n_estimators=100, max_depth=12, random_state=42); LinearRegression and GradientBoosting(random_state=42) selection; unsupported model_type `ValueError` naming supported types; `RuntimeError` before fit for `predict` and `evaluate`; `evaluate` returns MAE, RMSE, R2; `get_risk_advisory` equals `alerts.get_aqi_advisory`; xgboost-unavailable path via monkeypatched `utils.xgboost_available`
     - _Requirements: 1.5, 11.1, 11.2, 11.3, 11.4, 11.5, 11.7, 11.12_
 
-  - [~] 13.18 Write property test for EPA tier mapping
+  - [x] 13.18 Write property test for EPA tier mapping
     - **Property 10: EPA tier mapping by decimal boundaries**
     - **Validates: Requirements 12.1, 12.2, 12.9, 18.8**
 
-  - [~] 13.19 Write property test for advisory fields
+  - [x] 13.19 Write property test for advisory fields
     - **Property 11: Advisory fields follow the thresholds**
     - **Validates: Requirements 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 11.7**
 
-  - [~] 13.20 Write property test for invalid AQI inputs
+  - [x] 13.20 Write property test for invalid AQI inputs
     - **Property 12: Invalid AQI inputs are rejected**
     - **Validates: Requirements 12.10, 12.11, 18.9**
 
-  - [~] 13.21 Write the alerts example tests
+  - [x] 13.21 Write the alerts example tests
     - In `tests/test_alerts.py`: the 13 values 0, 50, 51, 100, 101, 150, 151, 200, 201, 300, 301, 500, 600 with tier and colour; all six verbatim warning texts; 200 gives Unhealthy with no curfew and 200.5 gives Very Unhealthy with "Brick Kiln & Heavy Vehicle Curfew Required" (curfew follows the tier boundary)
     - _Requirements: 12.1, 12.2, 12.3, 12.7, 12.8, 18.8_
 
-  - [~] 13.22 Write property test for project metrics
+  - [x] 13.22 Write property test for project metrics
     - **Property 9: Project metrics equal scikit-learn**
     - **Validates: Requirements 11.5, 18.7**
 
-  - [~] 13.23 Write property test for the inversion proxy
+  - [x] 13.23 Write property test for the inversion proxy
     - **Property 17: Inversion proxy formula and monotonicity**
     - **Validates: Requirements 8.8, 17.9**
 
-  - [~] 13.24 Write property test for slider clamping and scenario rows
+  - [x] 13.24 Write property test for slider clamping and scenario rows
     - **Property 19: Slider default clamping and scenario rows**
     - **Validates: Requirements 17.10, 17.11, 17.12**
 
-  - [~] 13.25 Write property test for tier metrics
+  - [x] 13.25 Write property test for tier metrics
     - **Property 20: Tier metrics match their definitions**
     - **Validates: Requirements 13.5, 13.6**
 
-  - [~] 13.26 Write the utils example tests
+  - [x] 13.26 Write the utils example tests
     - In `tests/test_utils.py`: `pm25_sub_index` breakpoint endpoints for both tables; precision and recall NaN when there are no positives; `stagnation_flag` at 4.99 and 5.0 km/h; `inversion_level` at 0.25 and 0.50; `model_path` format
     - _Requirements: 5.10, 8.7, 13.6_
 
-  - [~] 13.27 Run the full test suite and fix real failures
+  - [x] 13.27 Run the full test suite and fix real failures
     - Run `python -m pytest -v` from the project root
     - Fix failures in the source code when the test reflects the spec; never weaken a test to make it pass; rerun until green or report what still fails and why
     - Keep the real pass/fail output for the checkpoint
