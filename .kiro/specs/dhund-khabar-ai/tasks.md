@@ -354,34 +354,34 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - Keep the real pass/fail output for the checkpoint
     - _Requirements: 18.14_
 
-- [~] 14. Checkpoint: Phase 6 complete
+- [x] 14. Checkpoint: Phase 6 complete
   - Stop implementation. Show the real `python -m pytest -v` output with pass and fail counts, list which test covers each of Requirements 18.1–18.13 and the embargo test, and describe any source fixes made
   - Wait for the user to reply "continue"
   - _Requirements: 4.2, 4.3, 18.14_
 
-- [ ] 15. Phase 7: Documentation
-  - [~] 15.1 Write `requirements.txt`
+- [x] 15. Phase 7: Documentation
+  - [x] 15.1 Write `requirements.txt`
     - Exactly: joblib==1.5.3, matplotlib==3.10.9, numpy==2.5.3, pandas==2.3.3, pytest==9.1.1, scikit-learn==1.8.0, seaborn==0.13.2, streamlit==1.42.0; xgboost not pinned
     - _Requirements: 1.2, 1.3_
 
-  - [~] 15.2 Write the README problem, dataset, and methodology sections
+  - [x] 15.2 Write the README problem, dataset, and methodology sections
     - Problem statement on winter smog in Lahore and Peshawar; objectives; dataset description with real counts from `docs/data_audit.md` and provenance flagged as unconfirmed
     - Methodology: feature groups, exact inversion proxy formula and thresholds, us_aqi feature decision, time-based split with the per-horizon embargo table from the Phase 2 output, why random cross-validation is wrong for this data, models and baselines, EPA alert system with the decimal-boundary rule
     - _Requirements: 19.1, 19.2_
 
-  - [~] 15.3 Write the README results and discussion sections
+  - [x] 15.3 Write the README results and discussion sections
     - Tables built from `results/metrics.csv` (full test and winter-only, tier accuracy, Unhealthy-or-worse recall and precision) and figures from `results/figures/`
     - Which horizons work, where the model fails, every case where Random Forest did not beat persistence, winter performance
     - Why the Simulation_Mode model exists, with the measured sensitivity of both models from `results/sensitivity.csv`
     - _Requirements: 19.3, 19.4, 19.5_
 
-  - [~] 15.4 Write the README limitations, future work, commands, and structure sections
+  - [x] 15.4 Write the README limitations, future work, commands, and structure sections
     - Compute the real EPA tier counts by applying `alerts.aqi_to_tier_index` to the master file's non-NaN us_aqi per city with a short command, and quote the printed output
     - Limitations: possibly modeled data, no emissions, stubble-burning, or traffic data, two cities only, skill drops with horizon, sliders are statistical, not a health tool, the Leading_Gap, tier imbalance with real counts, us_aqi > 500 mapped to Hazardous (Emergency), Forecast_Like_Rows found by the audit
     - Future work; run commands `pip install -r requirements.txt`, `python scripts/audit_data.py`, `python scripts/train_all.py`, `streamlit run app.py`, `pytest` (with the `python -m` forms for the global interpreter); project structure tree
     - _Requirements: 19.6, 19.7, 19.8_
 
-  - [~] 15.5 Cross-check every README number against the result files
+  - [x] 15.5 Cross-check every README number against the result files
     - Compare each number in `README.md` with `results/metrics.csv`, `results/sensitivity.csv`, `docs/data_audit.md`, and the tier-count output; fix any mismatch
     - _Requirements: 2.1, 19.3_
 
