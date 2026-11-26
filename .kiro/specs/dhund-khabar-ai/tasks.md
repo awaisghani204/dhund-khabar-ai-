@@ -385,12 +385,12 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     - Compare each number in `README.md` with `results/metrics.csv`, `results/sensitivity.csv`, `docs/data_audit.md`, and the tier-count output; fix any mismatch
     - _Requirements: 2.1, 19.3_
 
-- [~] 16. Checkpoint: Phase 7 complete
+- [x] 16. Checkpoint: Phase 7 complete
   - Stop implementation. Show the README section outline, the results tables as written, the limitations list, and `requirements.txt`
   - Wait for the user to reply "continue"
   - _Requirements: 4.2, 4.3_
 
-- [~] 17. Final deliverable
+- [x] 17. Final deliverable
   - Provide the final file tree (generated from the real workspace) and the exact PowerShell commands, run from the project root, for every script, the tests, and the dashboard: `python -m pip install -r requirements.txt`, `python scripts/audit_data.py`, `python -m src.pipeline`, `python scripts/train_all.py`, `python scripts/train_all.py --figures-only`, `python -m pytest`, `python -m streamlit run app.py`
   - Give a plain-language walkthrough with every technical term explained: the purpose of AirQualityDataPipeline and SmogPredictorModel, the end-to-end prediction flow, why the split is by time with an embargo, and the Persistence_Baseline with the real result of whether Random Forest beat it for each city, target, and horizon
   - Give the five most likely teacher questions with answers based on the real results
