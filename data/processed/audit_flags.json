@@ -1,5 +1,0 @@
-{
-  "forecast_like_start": null,
-  "method": "Two checks per city. (1) Rows with a timestamp later than the audit run time are flagged because they cannot be observations. (2) For the last 180 days of each city, weekly statistics (Monday-Sunday weeks) are computed for pm2_5 and us_aqi: the share of hours equal to the previous hour, the median number of decimal places, and the lag-1 autocorrelation. A week is flagged when its repeated-value share exceeds 3 times the 2023 baseline of the same city and column, or when its median decimal places fall below the 2023 baseline. The lag-1 autocorrelation is reported for review but does not flag a week. forecast_like_start is the earliest flagged timestamp over both checks and both cities. Rows are flagged only, never removed.",
-  "audit_run": "2026-11-21 23:11:48"
-}

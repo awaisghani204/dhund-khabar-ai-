@@ -1,0 +1,16 @@
+﻿# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local environments and secrets
+.venv/
+venv/
+.env
+.kiro/settings/
+
+# Regenerable outputs (see README "How to run")
+# data/processed/ is rebuilt by:  python -m src.pipeline
+# models/ is rebuilt by:          python scripts/train_all.py
+data/processed/
+models/
