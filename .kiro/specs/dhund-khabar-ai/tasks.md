@@ -397,6 +397,19 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
   - List every known weakness of the system (data provenance, Forecast_Like_Rows, Leading_Gap, tier imbalance, AQI > 500, horizon skill drop, weak weather sensitivity if measured, heuristic inversion proxy, two cities, no emissions data, and any test or check that did not pass)
   - _Requirements: 20.1, 20.2, 20.3, 20.4_
 
+- [x] 18. Data source check (Phase 1 addendum, requested after delivery)
+  - [x] 18.1 Look for documentation of the data source in the project folder
+    - Search for README, metadata, notebook, or script files that say where `data/pakistan_smog_master_hourly.csv` came from and report what is found
+    - _Requirements: 5.12_
+
+  - [x] 18.2 Compare the CSV with Open-Meteo for the same timestamps
+    - Fetch a few hourly days from the Open-Meteo Air Quality and Weather APIs for Peshawar (34.0151, 71.5249) and Lahore (31.5204, 74.3587) for dates in the CSV, with the same variable names, and compare values, timezone, and units. If the API cannot be reached, say so
+    - _Requirements: 2.1, 5.12_
+
+  - [x] 18.3 Record the result and update the data-source wording
+    - Save the result to `docs/data_source_check.md`; update the data-source wording in `README.md` and `docs/final_deliverable.md`; `src/live_data.py` does not exist and must not be created, only reported
+    - _Requirements: 5.12, 19.1_
+
 ## Notes
 
 - Tasks marked with `*` are optional quick tests written next to each module. Skipping them is safe because Phase 6 (task 13) delivers the complete required test list, including every listed test, the named embargo test, and all 20 property tests. Task 13 sub-tasks are not optional.
@@ -464,7 +477,10 @@ Code rules for every task: exactly two classes (AirQualityDataPipeline, SmogPred
     { "id": 49, "tasks": ["15.4"] },
     { "id": 50, "tasks": ["15.5"] },
     { "id": 51, "tasks": ["16"] },
-    { "id": 52, "tasks": ["17"] }
+    { "id": 52, "tasks": ["17"] },
+    { "id": 53, "tasks": ["18.1"] },
+    { "id": 54, "tasks": ["18.2"] },
+    { "id": 55, "tasks": ["18.3"] }
   ]
 }
 ```

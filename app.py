@@ -30,7 +30,7 @@ import streamlit as st
 
 # src.charts selects the Agg backend before pyplot is imported, so it must be
 # imported before matplotlib.pyplot.
-from src import alerts, charts, utils
+from src import alerts, charts, live_data, utils
 from src.model import SmogPredictorModel
 from src.pipeline import DATETIME_FORMAT, MODEL_DATASET_FILENAME, AirQualityDataPipeline
 
@@ -79,8 +79,9 @@ GAUGE_TICKS: list[int] = [0, 50, 100, 150, 200, 300, 500]
 # 4 = Very Unhealthy, 5 = Hazardous (Emergency) (Requirement 17.6).
 PULSE_TIER_INDEX: int = 4
 
-# Pollutants shown in the hero mini row: (column, label). Open-Meteo reports
-# all four in µg/m³, including carbon monoxide (values around 1000 in the data).
+# Pollutants shown in the hero mini row: (column, label). The file matches the
+# Open-Meteo Air Quality API exactly, which reports all four in µg/m³, including
+# carbon monoxide (values around 1000 in the data). See docs/data_source_check.md.
 HERO_POLLUTANTS: list[tuple[str, str]] = [
     ("pm2_5", "PM2.5"),
     ("pm10", "PM10"),
@@ -709,7 +710,7 @@ def render_missing_file(path: Path, script: str) -> None:
     )
 
 
-def render_header(last_ts: pd.Timestamp) -> None:
+def render_header(last_ts: pd.Timestamp, source_label: str = 'Historical dataset') -> None:
     """Render the title, the data badge and the "Historical dataset" label.
 
     The badge reads "Latest Available Data: <last timestamp> | Peshawar vs.
@@ -736,7 +737,7 @@ def render_header(last_ts: pd.Timestamp) -> None:
             "</div>",
             '<div class="dk-header-meta">',
             f'<span class="dk-badge"><span class="dk-dot"></span>{esc(badge)}</span>',
-            '<span class="dk-pill dk-pill-historical">Historical dataset</span>',
+            '<span class="dk-pill dk-pill-historical">{esc(source_label)}</span>',
             "</div>",
             "</div>",
         ),
@@ -2004,7 +2005,8 @@ def render_footer() -> None:
     Returns:
         None.
     """
-    st.markdown(f'<div class="dk-footer">{esc(FOOTER_TEXT)}</div>', unsafe_allow_html=True)
+    attribution = ('<a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>. Non-commercial use.')
+    st.markdown(f'<div class="dk-footer">{esc(FOOTER_TEXT)}<br>{attribution}</div>', unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------
@@ -2038,6 +2040,28 @@ def main() -> None:
         render_footer()
 
 
+
+def _recent_feature_frame():
+    """Build features from recent Open-Meteo hours. Does not train a model."""
+    notices = []
+    frames = []
+    try:
+        for name in utils.CITIES:
+            frame, status = live_data.load_recent(name)
+            frames.append(frame)
+            notices.append(status["notice"])
+        raw = pd.concat(frames, ignore_index=True)
+        raw["datetime"] = pd.to_datetime(raw["datetime"])
+        raw = raw.sort_values(["city", "datetime"]).reset_index(drop=True)
+        pipe = AirQualityDataPipeline(flags_path=utils.PROCESSED_DIR / "audit_flags.json")
+        featured = pipe.generate_time_features(raw)
+        featured = pipe.create_lag_and_rolling_features(featured)
+        return featured, notices
+    except Exception as exc:
+        return None, [
+            "Recent Open-Meteo data could not be prepared (" + str(exc) + "). Forecast uses the historical file."
+        ]
+
 def render_sections() -> None:
     """Load the inputs and render every page section except the footer.
 
@@ -2049,8 +2073,26 @@ def render_sections() -> None:
         features = load_features(str(FEATURES_PATH))
     # The badge timestamp always comes from the data; without data it says
     # "unknown" instead of showing a made-up time.
-    last_ts = features["datetime"].max() if features is not None and not features.empty else None
-    render_header(last_ts)
+    recent, notices = _recent_feature_frame()
+    for text in notices:
+        st.markdown(
+            html_block('<div class="dk-card dk-missing" role="status">', esc(text), "</div>"),
+            unsafe_allow_html=True,
+        )
+    forecast_features = recent if recent is not None else features
+    if recent is not None and not recent.empty:
+        last_ts = pd.to_datetime(recent["datetime"]).max()
+        joined = " ".join(notices)
+        if "historical file" in joined and "Open-Meteo, " not in joined:
+            source_label = "Historical dataset"
+        elif "last saved fetch" in joined:
+            source_label = "Saved Open-Meteo fetch"
+        else:
+            source_label = "Open-Meteo dataset"
+    else:
+        last_ts = features["datetime"].max() if features is not None and not features.empty else None
+        source_label = "Historical dataset"
+    render_header(last_ts, source_label)
     if features is None:
         render_missing_file(FEATURES_PATH, TRAIN_SCRIPT)
 
@@ -2067,8 +2109,8 @@ def render_sections() -> None:
 
     city, horizon = render_controls()
     selected_forecast: dict | None = None
-    if features is not None:
-        selected_forecast = render_forecast_sections(features, models, city, horizon)
+    if forecast_features is not None:
+        selected_forecast = render_forecast_sections(forecast_features, models, city, horizon)
 
     # Analytics and the policy terminal still render without features: the
     # comparison table needs only metrics.csv, and the terminal explains that

@@ -1271,6 +1271,64 @@
         "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
         "timestamp": 1795636631770
       }
+    ],
+    "18.1 Look for documentation of the data source in the project folder": [
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766457128
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766467652
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766666790
+      }
+    ],
+    "18.2 Compare the CSV with Open-Meteo for the same timestamps": [
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766467022
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766667407
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795773614768
+      }
+    ],
+    "18.3 Record the result and update the data-source wording": [
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795766467295
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795773615206
+      },
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795775377007
+      }
+    ],
+    "18. Data source check (Phase 1 addendum, requested after delivery)": [
+      {
+        "executionId": "8fa24308-99a2-4646-bb2f-40e10912f052",
+        "chatSessionId": "sess_377f6a00-978e-4d2d-b9dd-da865a2387a2",
+        "timestamp": 1795775377527
+      }
     ]
   }
 }

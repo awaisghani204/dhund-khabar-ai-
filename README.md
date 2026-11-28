@@ -63,9 +63,11 @@ The first non-missing `pm2_5` is at 2022-08-04 05:00 and the first non-missing `
 
 **Winter pattern in the data.** For `pm2_5` in both cities, the three highest monthly means are months 1, 12 and 11. For Lahore `us_aqi` the top three are also 1, 12 and 11. For Peshawar `us_aqi` the top three are months 1, 12 and 7, so 2 of 3 are winter months.
 
-### Provenance: not confirmed
+### Provenance: Open-Meteo model output
 
-**It is unconfirmed whether this data comes from ground sensors or from a model or reanalysis product.** The audit could not decide this, and the student must confirm the source. Observation, not a fact: the column names (`pm10`, `pm2_5`, `carbon_monoxide`, `nitrogen_dioxide`, `sulphur_dioxide`, `ozone`, `dust`, `us_aqi`, `temperature_2m`, `relative_humidity_2m`, `wind_speed_10m`, ...) look like the variable names of the Open-Meteo Air Quality API, which serves CAMS model output. If that is the source, the values are model estimates and not sensor readings, and every conclusion below is about those estimates. Treat the results accordingly.
+**The values match Open-Meteo exactly, so the data is Open-Meteo output: model estimates, not ground-sensor measurements.** The file was compared with the Open-Meteo Air Quality API and the Open-Meteo weather series in 5 three-day windows for each of the 2 cities (72 hours per window). In every tested window, every compared value was identical (exact share 1.000, mean absolute difference 0). The air-quality columns (`pm10`, `pm2_5`, `carbon_monoxide`, `nitrogen_dioxide`, `sulphur_dioxide`, `ozone`, `dust`, `us_aqi`) are atmospheric-model values based on CAMS data, as the Open-Meteo documentation describes. The weather columns are Open-Meteo's default weather series. Timestamps are Asia/Karachi time, wind is in km/h and concentrations are in µg/m³. Every conclusion in this report is therefore about a model product, not about what a sensor would read. The dashboard can also request the last 7 completed days from the same APIs (`src/live_data.py`, `forecast_days=0`). Because those values already match the CSV, no retraining on a fresh download is proposed.
+
+**Still unknown:** who prepared the file, when, and with which script. The earliest rows (from 2022-08-01) were not tested, and an exact match today does not prove what the API returned when the file was made. The student should state the source (Open-Meteo, CAMS-based) in the report and name who prepared the file. Method, numbers, limits and the failed requests are in [`docs/data_source_check.md`](docs/data_source_check.md). `docs/data_audit.md` keeps the original "not confirmed" caveat from the Phase 1 audit, and the source check supersedes it.
 
 Two audit findings are consistent with `us_aqi` not being a plain PM2.5 index:
 
@@ -502,7 +504,7 @@ All figures are in `results/figures/`.
 
 **US AQI vs PM2.5 targets.** MAE values cannot be compared across the two targets because the units differ. By R² at 24 h, the US AQI model is better in 3 of 4 city/subset groups (the exception is Peshawar winter, 0.519 vs 0.653). At 72 h the PM2.5 model has the higher R² in all 4 groups. The US AQI models lose accuracy faster as the horizon grows.
 
-**Why simple models do as well.** Hourly pollution is strongly autocorrelated, so the current value and its lags explain most of what can be predicted, and Linear Regression can use them nearly as well as a forest. Random Forest averages many trees into steps, which smooths its output and makes it weaker at extremes. These are likely reasons, not tested here. The data may also be a model estimate instead of sensor readings (see Dataset), which would make it smoother and easier for simple models.
+**Why simple models do as well.** Hourly pollution is strongly autocorrelated, so the current value and its lags explain most of what can be predicted, and Linear Regression can use them nearly as well as a forest. Random Forest averages many trees into steps, which smooths its output and makes it weaker at extremes. These are likely reasons, not tested here. The data are model estimates instead of sensor readings (see Dataset), which may make them smoother and easier for simple models. That is an inference, not tested.
 
 **What this means for the default model.** Random Forest is the dashboard's default by decision. The measured results do not support it as the most accurate choice: Linear Regression or Gradient Boosting scored a lower MAE in all 24 comparisons, mostly by a few percent. Random Forest still beats persistence in all 24, so it is a valid forecaster, and the dashboard must not present it as the best available model. The simulation model is for exploring what-if inputs and not for forecasting: it loses to persistence in one case and its humidity response is not reliable.
 
@@ -557,13 +559,13 @@ Good is almost never observed (0.17 % of hours) and Hazardous (Emergency) occurs
 
 ### Data
 
-- **Provenance is not confirmed.** The values may be modelled or reanalysis data and not sensor readings. The column names resemble Open-Meteo / CAMS output. That is an observation, not a finding. The student must confirm the source before claiming the data are measurements (see Dataset).
+- **The data are Open-Meteo model estimates, not sensor measurements.** An exact-match check against the Open-Meteo APIs (5 windows x 2 cities) showed the file is Open-Meteo output. The air-quality values are CAMS-based atmospheric-model values, so the results describe a model product, not ground monitors. Who prepared the file, when and how is unknown, and the earliest rows were not tested (see [`docs/data_source_check.md`](docs/data_source_check.md)).
 - **`us_aqi` is not exactly the EPA formula applied to the PM2.5 column.** On a sample of 5,000 rows, 73.18 % did not match the 2024 PM2.5 table. `us_aqi` appears to start 24 hours after PM2.5, which suggests a 24-hour average, and it may include other pollutants. The models therefore predict the file's `us_aqi`, not an EPA index computed here.
 - **Missing drivers.** The data contain no emissions, stubble-burning (crop residue), brick kiln, traffic or industrial data. The model sees only weather and past pollution, so it cannot anticipate a change in sources.
 - **Two cities only.** Lahore and Peshawar. Nothing here shows the models work in other cities.
 - **Leading_Gap.** The first 77 of 101 leading hours with missing values were dropped (Gap_Strategy, see Cleaning). The earliest part of the record is not used.
 - **AQI above 500.** 9 rows (all Lahore, maximum 538) exceed the EPA scale. They are mapped to Hazardous (Emergency) and not removed.
-- **Forecast_Like_Rows are unresolved.** The audit flagged none. Two rows per city after the file's last-modified time were kept, and they may have been forecasts when the file was saved. This could not be settled from the file.
+- **Forecast_Like_Rows are unresolved.** The audit flagged none. Two rows per city (22:00 and 23:00 on 2026-11-19) are later than the file's creation time (21:18 that day) and were kept. They could not have been observed when the file was made, so they are likely model forecast values. This is an inference from the timestamps and was not tested by the API comparison. Recent days before them may also be forecast rather than analysis values, which is untested.
 
 ### Models and evaluation
 
@@ -579,7 +581,7 @@ Good is almost never observed (0.17 % of hours) and Hazardous (Emergency) occurs
 
 ## Future work
 
-- Confirm the data provenance and compare with ground monitors, for example a PM2.5 sensor network in Lahore and Peshawar.
+- Compare with ground monitors, for example a PM2.5 sensor network in Lahore and Peshawar. The data source is already identified as Open-Meteo model output (see Dataset).
 - Add emissions, fire (stubble burning), traffic and boundary-layer-height data.
 - Add more cities.
 - Try quantile or probabilistic forecasts, or classify tiers directly with class weights, to improve recall of severe events.
@@ -629,6 +631,8 @@ dhund khabar ai/
 │       └── model_dataset.csv               Final model dataset
 ├── docs/
 │   ├── data_audit.md                       Audit report
+│   ├── data_source_check.md                Open-Meteo source check (supersedes the audit's provenance caveat)
+│   ├── data_source_check_numbers.json      Raw numbers and request URLs of the source check
 │   └── stitch/                             Dashboard design files from Stitch
 │       ├── design_system.md                Design system notes
 │       ├── screen_prompt.md                Prompt used to generate the screen
@@ -654,6 +658,7 @@ dhund khabar ai/
 │   ├── alerts.py               EPA tiers and alert logic
 │   ├── charts.py               Chart builders for the dashboard
 │   ├── model.py                Model training and prediction helpers
+│   ├── live_data.py            Recent Open-Meteo hours; no training
 │   ├── pipeline.py             Cleaning and feature engineering
 │   └── utils.py                Shared helpers
 └── tests/                      pytest suite on synthetic data
@@ -661,6 +666,7 @@ dhund khabar ai/
     ├── test_alerts.py
     ├── test_conftest_smoke.py
     ├── test_model.py
+    ├── test_live_data.py
     ├── test_pipeline.py
     └── test_utils.py
 ```

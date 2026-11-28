@@ -29,6 +29,8 @@ dhund khabar ai/
 │       └── model_dataset.csv
 ├── docs/
 │   ├── data_audit.md
+│   ├── data_source_check.md                 Open-Meteo source check (supersedes the audit's provenance caveat)
+│   ├── data_source_check_numbers.json       raw numbers and request URLs of the source check
 │   ├── final_deliverable.md                 this file
 │   └── stitch/                              dashboard design files (html/png/md/json)
 ├── models/                                  NOT in git (rebuilt): 38 .joblib files, about 84 MB
@@ -106,6 +108,7 @@ cd "d:\5th sem\prog ai lab\dhund khabar ai"
 | Precision (Unhealthy or worse) | Of the hours the model flagged, the share that really were above 150. |
 | Winter | November, December, January, February. |
 | Persistence_Baseline | "Tomorrow will be like now": the forecast for t+h is the value at t. No training. |
+| Open-Meteo / CAMS | Open-Meteo is a free weather and air-quality data service. Its air-quality values come from CAMS (the Copernicus Atmosphere Monitoring Service), an atmospheric computer model. The data file matches Open-Meteo exactly, so the values are model estimates, not sensor readings. |
 | Inversion proxy | A formula (`humidity/100 - temperature/40`) standing in for a thermal inversion, a warm air layer that traps cold polluted air near the ground. It is a heuristic, not a measurement. |
 
 ### 2.2 The two classes
@@ -185,9 +188,12 @@ Honest answer: Random Forest was chosen as the default at the start of the proje
 Four checks, with named tests in `tests/test_pipeline.py`: `test_no_cross_city_leakage` (features of one city never use rows from the other), `test_past_only_lag_and_rolling_features` (lags and rolling windows use only values at or before the current hour), `test_per_horizon_embargo` (last training label is before 2025-01-01 for 24, 48 and 72 h), and `test_feature_lists_never_leak_targets_or_aqi_family` (PM2.5 models never get `us_aqi` or `aqi_category`; no feature list contains a target). The split is by time, and `us_aqi` is allowed only in the AQI models because it is known at prediction time. Limit: these tests run on synthetic data, so they prove the code, not the real data; the pipeline also asserts the embargo when it runs on the real file.
 
 **Q5. How reliable is the data, what are the limits, and can this be used for real warnings?**
-No, it must not be used for real warnings. The data source is unconfirmed: the column names resemble the Open-Meteo / CAMS API, which would make the values model estimates and not sensor readings. `us_aqi` does not match the EPA PM2.5 formula (73.18 % of a 5,000-row sample differ). The model is useful at 24 h (R² 0.63 Peshawar, 0.67 Lahore for US AQI), moderate at 48 h (0.40, 0.43), weak at 72 h (0.32, 0.29), and it under-predicts peaks: Peshawar Unhealthy-or-worse recall is 0.402 at 24 h. Lahore is better (0.796). It was tested on one split of about 22 months, and it has no emissions or stubble-burning data. The dashboard says this in its footer.
+No, it must not be used for real warnings. The data is Open-Meteo output: an exact-match check against the Open-Meteo APIs (5 windows x 2 cities, 72 hours each) found every tested value identical. Open-Meteo's air-quality values are CAMS atmospheric-model estimates, so the data are model estimates and not sensor readings (details in `docs/data_source_check.md`). Who prepared the file is unknown. `us_aqi` does not match the EPA PM2.5 formula (73.18 % of a 5,000-row sample differ). The model is useful at 24 h (R² 0.63 Peshawar, 0.67 Lahore for US AQI), moderate at 48 h (0.40, 0.43), weak at 72 h (0.32, 0.29), and it under-predicts peaks: Peshawar Unhealthy-or-worse recall is 0.402 at 24 h. Lahore is better (0.796). It was tested on one split of about 22 months, and it has no emissions or stubble-burning data. The dashboard says this in its footer.
 
 ### Bonus questions
+
+**B4. Where is the dataset from?**
+The file matches Open-Meteo exactly. I downloaded the same hours from the Open-Meteo Air Quality API and weather series for Lahore and Peshawar in 5 three-day windows (2023-01 to 2026-10) and every compared value was identical, with timestamps in Asia/Karachi time, wind in km/h and concentrations in µg/m³. So the data is Open-Meteo output. Its air-quality values are CAMS atmospheric-model estimates, not ground-sensor readings, and the weather is Open-Meteo's default model series. What I do not know: who prepared the file, when, and with which script; the earliest rows (from 2022-08) were not tested; and an exact match today does not prove what the API returned when the file was made. The last two hours of the file (2026-11-19 22:00 and 23:00) are later than the file's creation time (21:18), so they are likely forecast values (likely, not tested). Full numbers: `docs/data_source_check.md`.
 
 **B1. What do the What-If sliders mean, and are they causal?**
 They change wind, temperature or humidity for the last row and show how the simulation model's predicted AQI changes. They are not causal and not a physical simulation. The model learned associations from past data. Wind moved the prediction the expected way (lower AQI) in 4 of 4 city/model cases (simulation: Peshawar -1.9, Lahore -11.1 AQI points for +5 km/h). Humidity matched the expected direction in only 2 of 4 cases, with effects of at most 0.18 points, so treat humidity as no evidence of a real effect.
@@ -204,8 +210,8 @@ Lahore hours above about 350 AQI are predicted at roughly 130 to 200 (see the sc
 
 | # | Weakness | What to say if asked |
 |---|---|---|
-| 1 | **Data provenance unconfirmed.** Column names look like Open-Meteo / CAMS output, so values may be model estimates, not sensors. | "I could not confirm the source; if it is a model product, my results describe that product, not ground sensors." |
-| 2 | **Forecast_Like_Rows unresolved.** The audit flagged none (0 of 27 weeks per city), but 2 rows per city are timestamped after the file's last-modified time (2026-11-19 21:18:50). They were kept. | "The audit found no forecast-like pattern, but 2 rows per city are later than the file was saved and I could not settle what they are." |
+| 1 | **Data are model estimates, not sensors.** The file matches Open-Meteo exactly in 5 windows x 2 cities, and Open-Meteo's air-quality values are CAMS atmospheric-model output. Who prepared the file, when and how is unknown; the earliest rows were not tested. | "The data is Open-Meteo output (checked by exact match), so my results describe a model product, not ground sensors. I do not know who prepared the file." |
+| 2 | **Forecast_Like_Rows unresolved.** The audit flagged none (0 of 27 weeks per city), but 2 rows per city (2026-11-19 22:00 and 23:00) are later than the file's creation time (21:18). They were kept. They are likely forecast values (inference from timestamps, not tested by the API comparison). Recent days before them may also be forecast rather than analysis values (untested). | "The audit found no forecast-like pattern, but the last 2 hours per city are later than the file was created, so they are probably forecasts. I did not test that." |
 | 3 | **Leading_Gap.** The first 77 hours (pollutants) and 101 hours (`us_aqi`) are missing in both cities and left missing. | "The start of the record has no pollution values; those rows are not used. Weather is complete." |
 | 4 | **Tier imbalance.** Good has 131 rows of 75,254 (0.17 %). Hazardous has 230 rows, all in Lahore. Peshawar has only 139 Very Unhealthy and 0 Hazardous hours. | "Rare tiers have too few examples to score reliably, so I report Unhealthy-or-worse recall and precision, not per-tier scores." |
 | 5 | **AQI above 500.** 9 rows in Lahore, maximum 538, above the EPA scale. Kept and mapped to Hazardous (Emergency). | "The scale ends at 500; I kept the rows and treat them as the top tier." |
